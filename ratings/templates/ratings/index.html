@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - GroznyQwiz{% endblock %}
+
+{% block content %}
+    <!-- Вкладки -->
+    <div class="main-tabs">
+        <div class="main-tab active" data-tab="teams">
+            <i class="fas fa-users"></i>
+            <span>Команды</span>
+        </div>
+        <div class="main-tab" data-tab="games">
+            <i class="fas fa-trophy"></i>
+            <span>Игры</span>
+        </div>
+    </div>
+
+    <!-- Панель управления -->
+    <div class="control-panel">
+        <div class="search-container">
+            <div class="search-field">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" value ="{{search_query}}" placeholder="Поиск по командам и играм...">
+                <button type="button" class="clear-search">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <button type="button" id="search-button" class="search-button">Найти</button>
+        </div>
+
+        <form method="get" id="filters" class="filter-container">   
+            {% comment %} Чтобы знать какая вкладка при использовании фильтров активна {% endcomment %}
+            <input type="hidden" name="active_tab" id="active_tab" value="teams">
+            {% comment %} Скрытое поле для поиска, чтоб работал вместе с фильтрами {% endcomment %}
+            <input type="hidden" name="search" value="{{ search_query }}">
+            <!-- Общие фильтры -->
+            <div class="filter-box">
+                <label><i class="fas fa-location-dot"></i> Город:</label>
+                <select name="city">
+                    <option value="">Все города</option>
+                    {% for city_obj in all_cities %}
+                        <option value="{{ city_obj.name }}" 
+                                {% if selected_city == city_obj.name %}selected{% endif %}>
+                            {{ city_obj.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Только для КОМАНД -->
+            <div class="filter-box team-only">
+                <label><i class="fas fa-sort"></i>Сортировка:</label>
+                <select name="team_sort">
+                    <option value="">По очкам</option>
+                    <option value="wins" {% if selected_team_sort == "wins" %}selected{% endif %}>По победам</option>
+                    <option value="avg" {% if selected_team_sort == "avg" %}selected{% endif %}>По среднему баллу</option>
+                </select>
+            </div>
+
+            <!-- Только для ИГР -->
+            <div class="filter-box game-only">
+                <label><i class="fas fa-filter"></i> Турнир:</label>
+                <select name="game_series">
+                    <option value="">Все турниры</option>
+                    {% for series in all_series %}
+                    <option value="{{ series.name }}" {% if selected_game_series == series.name %}selected{% endif %}>
+                        {{ series.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Фильтр по периоду -->
+            <div class="filter-box">
+                <label><i class="fas fa-calendar"></i> Период:</label>
+                <div class="period-filter">
+                    <button type="button" class="period-toggle">
+                        <i class="fas fa-sliders-h"></i> Выбрать
+                    </button>
+                    <div class="period-fields">
+                        <div class="date-input-group">
+                            <span class="date-label">с</span>
+                            <input type="date" name="date_from" id="date_from">
+                        </div>
+                        <div class="date-input-group">
+                            <span class="date-label">по</span>
+                            <input type="date" name="date_to" id="date_to">
+                        </div>
+                        <button type="button" class="clear-dates-btn">
+                            <i class="fas fa-times"></i> Сброс
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-box apply-button-box">
+                <button type="submit" class="apply-button">Применить</button>
+            </div>
+        </form>
+    </div>
+
+    
+    <!-- Таблицы -->
+    <div class="table-content" id="ajax-content">
+        {% include "ratings/includes/teams.html" %}
+        {% include "ratings/includes/games.html" %}
+    </div>
+
+
+{% endblock %}

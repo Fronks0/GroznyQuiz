@@ -1,0 +1,33 @@
+<!-- Таблица игр (скрыта по умолчанию) -->
+<div class="table-wrapper" id="games-table">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Город</th>
+                <th>Турнир</th>
+                <th>Число команд</th>
+                <th>Победитель</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for tournament in tournaments  %}        
+            <tr class="game-row" data-game-id="{{ tournament.id }}">
+                <td>{{ tournament.date }}</td>
+                <td>{{ tournament.city.name }}</td>
+                <td>{{ tournament.name }}</td>
+                <td>{{ tournament.results_count }}</td>
+                <td>
+                    {% if tournament.winner_achievements %}
+                        {% for achievement in tournament.winner_achievements %}
+                            {{ achievement.team.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

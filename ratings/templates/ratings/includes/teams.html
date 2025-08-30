@@ -1,0 +1,34 @@
+<!-- Таблица команд (активная по умолчанию) -->
+<div class="table-wrapper active" id="teams-table">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Место</th>
+                <th>Команда</th>
+                <th>Город</th>
+                <th>Игр сыграно</th>
+                <th>Побед</th>
+                <th>Очки</th>
+                <th>Ср. балл</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team in teams %}
+                <tr class="team-row" data-team-id="{{ team.id }}">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ team.name }}</td>
+                    <td>{{ team.city.name }}</td>
+                    <td>{{ team.games_played_count|default:0 }}</td>
+                    <td>{{ team.wins_count|default:0 }}</td>
+                    <td>{{ team.total_points_sum|default:0|floatformat }}</td>
+                    <td>{{ team.avg_points|floatformat:"-1"|default:0 }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="8">Нет данных о командах</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+

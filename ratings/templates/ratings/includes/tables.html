@@ -1,0 +1,9 @@
+<!-- ТОЛЬКО таблицы для AJAX -->
+
+<div id="teams-table" class="table-wrapper {% if active_tab == 'teams' %}active{% endif %}">
+    {% include "ratings/includes/teams.html" %}
+</div>
+
+<div id="games-table" class="table-wrapper {% if active_tab == 'games' %}active{% endif %}">
+    {% include "ratings/includes/games.html" %}
+</div>

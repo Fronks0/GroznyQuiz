@@ -1,0 +1,94 @@
+<!-- Модальное окно с детальной информацией о команде -->
+
+<button class="close-modal">&times;</button>
+<div class="team-header">
+    <div class="team-info">
+        <h2 class="team-name">{{team.name}}</h2>
+        <div class="team-meta">
+            <span class="city"><i class="fas fa-map-marker-alt"></i>{{ team.city.name }}</span>
+            <span class="last-game"><i class="fas fa-calendar-alt"></i>Последняя игра: {{ team.last_game_date|date:"d.m.Y"|default:"-" }}</span>
+        </div>
+    </div>
+</div>
+    
+<!-- Статистика под названием команды -->
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ team.games_played_count|default:0 }}</div>
+        <div class="stat-label">Игр сыграно</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ team.wins_count|default:0 }}</div>
+        <div class="stat-label">Побед</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ team.avg_points|floatformat:"-1"|default:0 }}</div>
+        <div class="stat-label">Ср. кол. очков</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ best_topic.short_name }}</div>
+        <div class="stat-label">Любимая тема</div>
+    </div>
+</div>
+
+<!-- Достижения -->
+<div class="achievements-section">
+    <h3><i class="fas fa-trophy"></i> Достижения</h3>
+    
+    {% for achievement in achievements %}
+    <div class="tournament-row">
+        <div class="tournament-name">{{ achievement.tournament__series__name }}</div>
+        <div class="tournament-stats">
+            <span class="game">Участий: {{ achievement.participations }}</span>
+            {% if achievement.gold > 0 %}
+            <span class="gold"><i class="fas fa-trophy"></i> {{ achievement.gold }}</span>
+            {% endif %}
+            {% if achievement.silver > 0 %}
+            <span class="silver"><i class="fas fa-medal"></i> {{ achievement.silver }}</span>
+            {% endif %}
+            {% if achievement.bronze > 0 %}
+            <span class="bronze"><i class="fas fa-medal"></i> {{ achievement.bronze }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="tournament-info">Пока нет достижений</div>
+    {% endfor %}
+</div>
+
+<!-- История игр -->
+<div class="history-table">
+    <h3><i class="fas fa-history"></i> История последних игр</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Турнир</th>
+                {% comment %} <th>Место</th> {% endcomment %}
+                <th>Очки</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in recent_games %}
+            <tr>
+                <td>{{ result.tournament.date|date:"d.m.Y" }}</td>
+                <td>{{ result.tournament.name }}</td>
+                {% comment %} <td>
+                    {% if result.dynamic_place <= 3 %}
+                        <span class="{% if result.dynamic_place == 1 %}gold{% elif result.dynamic_place == 2 %}silver{% else %}bronze{% endif %}">
+                            {{ result.dynamic_place }}
+                        </span>
+                    {% else %}
+                        {{ result.dynamic_place }}
+                    {% endif %}
+                </td> {% endcomment %}
+                <td>{{ result.total_points|floatformat:"-1" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Нет данных об играх</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

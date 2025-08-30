@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GroznyQwiz{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'deps/style/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Фон и затемнение -->
+    <div class="background"></div>
+    <div class="overlay"></div>
+
+    <!-- Шапка -->
+    <header>
+        <nav>
+            <div class="nav-header">
+                <a href="#" class="logo">
+                    <img src="{% static 'deps/img/qwiz.jpg' %}" alt="Логотип">
+                </a>
+                <button class="nav-btn"> 
+                    <i class="fas fa-bars open-menu"></i>
+                    <i class="fas fa-times close-menu"></i>
+                </button>
+            </div>
+
+            <ul class="navbar">
+                <li><a href="#" class="nav-link">Расписание игр</a></li>
+                <li><a href="#" class="nav-link">Рейтинг и результаты</a></li>
+                <li><a href="#" class="nav-link">Франшиза</a></li>
+                <li><a href="#" class="nav-link">Контакты</a></li>
+
+                <li class="social-icons">
+                    <a href="#" class="icon-circle inst"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="icon-circle whatsapp"><i class="fab fa-whatsapp"></i></a>
+                </li>
+
+                <li><a href="#" class="nav-link">Подробнее</a></li>
+                <li><a href="#" class="nav-course">Записаться на курс</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Контент -->
+    <main class="main-content">
+        {% block content %}
+        
+        {% endblock %}
+    </main>
+
+    <!-- Модалки (пустые контейнеры) -->
+        <div class="team-modal" id="teamModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <!-- Сюда AJAX будет вставлять содержимое -->
+            </div>
+        </div>
+
+        <div class="game-modal" id="gameModal">
+            <div class="modal-overlay game"></div>
+            <div class="modal-content game">
+                <!-- Сюда AJAX будет вставлять содержимое -->
+            </div>
+        </div>
+
+
+    <script src="{% static 'deps/js/app.js' %}"></script>
+    
+</body>
+</html>

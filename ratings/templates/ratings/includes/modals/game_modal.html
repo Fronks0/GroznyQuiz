@@ -1,0 +1,79 @@
+<!-- Модальное окно для деталей игры -->
+
+    <button class="close-modal">&times;</button>
+    
+    <div class="game-header">
+        <h2 class="game-title">{{game.name}}</h2>
+        <div class="game-meta">
+            <span><i class="fas fa-calendar"></i>{{game.date}}</span>
+            <span><i class="fas fa-map-marker-alt"></i> {{game.city}}</span>
+            <span><i class="fas fa-users"></i>{{ game.gameresult_set.count }}</span>
+        </div>
+    </div>
+    
+    <!-- Детальная таблица результатов -->
+    <div class="detailed-results">
+        <h3><i class="fas fa-table"></i> Результаты игры</h3>
+        <div class="excel-style-table-container">
+            <table class="excel-style-table">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Команда</th>
+                        {% for topic in topics|slice:":3" %}
+                            <th>{{ topic.short_name }}</th>
+                        {% endfor %}
+                        <th class="result">П.Р.</th>
+                        {% for topic in topics|slice:"3:" %}
+                            <th>{{ topic.short_name }}</th>
+                        {% endfor %}
+                        <th class="result">Результат</th>
+                        <th>Черный ящик</th>
+                        <th>+/-</th>
+                        <th class="result">Итог игры</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ result.dynamic_place }}</td>  <!-- Динамическое место -->
+                        <td>{{ result.team.name }}</td>
+                        {% for points in result.topic_points|slice:":3" %}
+                            <td>
+                                {% if points != '-' %}
+                                    {{ points|floatformat:"-1" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        {% endfor %}         
+                        <td class="result">{{ result.first_three_topics_points|floatformat:"-1" }}</td>
+                        {% for points in result.topic_points|slice:"3:" %}
+                            <td>
+                                {% if points != '-' %}
+                                    {{ points|floatformat:"-1" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        {% endfor %} 
+                        <td class="result">{{ result.points_before_black_box|floatformat:"-1" }}</td>
+                        <td>{{ result.black_box_answer|default:"-" }}</td>
+                        <td>{{ result.black_box_points|floatformat:"-1" }}</td>
+                        <td class="result">{{ result.total_points|floatformat:"-1" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+    <div class="game-info">
+        <h3><i class="fas fa-info-circle"></i> Информация об игре</h3>
+        {% for topic in topics  %}
+            <p>{{topic.short_name}} - {{topic.full_name}}</p>
+        {% endfor %}
+    </div>
+
+

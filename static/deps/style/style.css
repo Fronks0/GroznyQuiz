@@ -1,0 +1,1160 @@
+/* Сброс */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    list-style: none;
+    transition: all 0.3s;
+}
+
+body {
+    font-size: 62.5%;
+    font-family: Arial, sans-serif;
+    color: white;
+    padding-top: 6rem
+}
+
+/* Фон и затемнение */
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/static/deps/img/qwiz.jpg') no-repeat center center/cover;
+    z-index: -2;
+    background-size: 170% ;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(31, 21, 41, 0.65);
+    z-index: -1;
+}
+
+/* ====== HEADER ====== */
+header {
+    position: fixed;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    
+}
+
+header nav {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+/* Бургер и Лого */
+header .nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 20px;
+}
+
+header .nav-header .logo img {
+    width: 4.5rem;
+    height: auto;
+}
+
+/* Внешний вид бургера */
+header .nav-header .nav-btn {
+    background: transparent;
+    border: none;
+    font-size: 2.5rem;
+    cursor: pointer;
+    color: #fff;
+    z-index: 100;
+}
+
+/* По умолчанию скрываем один элементов бургера */
+header .nav-header .nav-btn .close-menu {
+    display: none;
+}
+
+/* Ссылки навигации */
+header .navbar .nav-link {
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 500;
+    display: inline-block;
+    transition: all 0.3s ease-in;
+    padding: 0.6rem 1rem;
+    white-space: nowrap;
+}
+
+
+
+
+header .navbar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #e0a0ff; 
+}
+
+/* Активная ссылка */
+nav a.active {
+    color: #e0a0ff;
+    font-weight: 600;
+}
+/* Эти два селектора нижние и отвечают за скрытие и расскрыте бурегра. в первом просто обнуляем высоту и скрываем все, что выходит за рамки
+во втором возвращаем высоту */
+header .navbar {
+    position: relative; /* чтобы вверх сдвинуть при открытии*/
+    top: -50px;
+    text-align: center;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-in;
+}
+
+.navbar.active {
+    min-height: 22rem;
+}
+
+header .nav-header .nav-btn.active .open-menu {
+    display: none;
+}
+header .nav-header .nav-btn.active .close-menu {
+    display: block;
+}
+
+/* Кнопка "Записаться на курс" */
+.nav-course {
+    display: inline-block;
+    font-size: 1.2rem;
+    background: white;
+    color: black;
+    border-radius: 25px;
+    padding: 0.8rem 1.5rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    white-space: nowrap;
+    
+}
+
+.nav-course:hover {
+    background: #2a1745;
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2); /* Белая полупрозрачная граница */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Легкая тень */
+}
+
+/* Соцсети */
+.social-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 20px;
+}
+
+.icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    background: white;
+    color: black;
+    font-size: 1.3rem;
+    transition: all 0.3s;
+    font-size: 1.5rem;
+}
+
+.icon-circle:hover {
+    transform: scale(1.1);;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.inst:hover {
+    color: #E4405F;
+}
+
+.whatsapp:hover {
+    color: #25D366;
+}
+
+
+@media screen and (min-width: 768px) {
+    header nav{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+    }
+
+    header .navbar {
+        all:initial; /* очищает все стили, которые были применены к navbar */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    header .nav-header .nav-btn{
+        display: none;
+    }
+    
+    header .navbar .nav-link{
+        font-size: 1rem;
+        margin: 0;
+    }
+    
+}
+
+
+/* ====== MAIN CONTENT ====== */
+
+
+/* Основные стили */
+.main-content {
+    max-width: 1200px;
+    margin: 50px auto 20px;
+}
+/* нужно будет вырезать. JS добавляет menu-open к body когда бурегер открыт. Поэтому расстояние такое. */
+body.menu-open .main-content {
+    margin-top: 18rem;
+}
+
+/* Вкладки "Команды" "Игры"*/
+.main-tabs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.main-tab {
+    padding: 18px 40px;
+    background: #2a1745;
+    color: #b39ddb;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    border: 2px solid #3d2a5e;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.main-tab.active {
+    background: #7c4dff;
+    color: white;
+    border-color: #9575cd;
+    box-shadow: 0 6px 16px rgba(124, 77, 255, 0.4);
+    transform: translateY(-3px);
+}
+
+.main-tab:hover {
+    background: #5e35b1;
+    color: white;
+}
+
+.main-tab i {
+    font-size: 1.2rem;
+}
+
+/* Панель управления */
+.control-panel {
+    background: #1f0f3a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 1px solid #3d2a5e;
+}
+
+.search-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.search-field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: #2a1745;
+    border-radius: 8px;
+    padding: 0 15px;
+    border: 1px solid #4a376b;
+}
+
+.search-field i {
+    color: #7c4dff;
+    margin-right: 1rem;
+}
+
+.search-field input {
+    flex: 1;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1rem;
+}
+
+.search-field input::placeholder {
+    color: #7a6f8a;
+}
+
+.clear-search {
+    background: none;
+    border: none;
+    color: #7a6f8a;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+.search-button {
+    padding: 0 25px;
+    background: #7c4dff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.search-button:hover {
+    background: #6a3ddf;
+}
+
+.search-button:active{
+    background: #5e35b1;
+}
+
+.search-field input:focus{
+    outline: none;
+}
+
+/* фильтры */
+.filter-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: nowrap;
+}
+
+.filter-box {
+    flex: 1;
+    min-width: 150px;
+}
+
+.filter-box label {
+    margin-bottom: 8px;
+    color: #b39ddb;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-box select {
+    width: 100%;
+    padding: 12px 15px;              
+    background: #2a1745;  
+    border: 1px solid #4a376b; 
+    color: white;
+    border-radius: 8px;           
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-box select:hover {
+    background: #3d2a5e;
+    border-color: #7c4dff;
+}
+
+/* Состояние фокуса */
+.filter-box select:focus {
+    border-color: #7c4dff;
+    outline: none;
+}
+
+
+
+/* Контейнер для кнопки */
+.apply-button-box {
+    flex: 0 0 auto;
+    min-width: 120px;
+    display: flex;
+    align-items: flex-end;
+}
+
+/* Стили для кнопки Применить */
+.apply-button {
+    width: 100%;
+    padding: 12px 15px;
+    background: #7c4dff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.apply-button:hover {
+    background: #6a3ddf;
+}
+
+.apply-button:active{
+    background: #5e35b1;
+}
+
+
+/* по умолчанию скрываем 2 фильтра*/
+.team-only,
+.game-only {
+  display: none; 
+}
+
+
+/* Стили для фильтра периода */
+.period-filter {
+    position: relative;
+}
+
+.period-toggle {
+    width: 100%;
+    padding: 12px 15px;
+    background: #2a1745;
+    border: 1px solid #4a376b;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.period-toggle:hover {
+    background: #3d2a5e;
+    border-color: #7c4dff;
+}
+
+.period-fields {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #2a1745;
+    border: 1px solid #4a376b;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 5px;
+    z-index: 1000;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    min-width: 200px;
+}
+
+.period-fields.show {
+    display: block;
+}
+
+.date-input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.date-input-group:last-child {
+    margin-bottom: 0;
+}
+
+.date-label {
+    color: #b39ddb;
+    font-weight: 500;
+    min-width: 20px;
+    font-size: 1rem;
+}
+
+.period-fields input[type="date"] {
+    flex: 1;
+    padding: 10px 12px;
+    background: #1f0f3a;
+    border: 1px solid #4a376b;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.period-fields input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.period-fields input[type="date"]:focus {
+    border-color: #7c4dff;
+    outline: none;
+}
+
+/* Сброс */
+.clear-dates-btn {
+    width: 100%;
+    padding: 10px;
+    background: #7c4dff;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.clear-dates-btn:hover {
+    background: #6a3ddf;
+
+}
+.clear-dates-btn i {
+    margin-right: 5px;
+}
+
+.clear-dates-btn:active{
+    background: #5e35b1;
+}
+
+
+
+
+/* Таблицы */
+.table-content {
+    background: #1f0f3a;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 1px solid #3d2a5e;
+}
+
+.table-wrapper {
+    display: none;
+    padding: 20px;
+}
+
+.table-wrapper.active {
+    display: block;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    padding: 16px 20px;
+    background: #2a1745;
+    color: #d1c4e9;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #3d2a5e;
+    font-size: 1rem;
+}
+
+.data-table td {
+    padding: 14px 20px;
+    color: white;
+    border-bottom: 1px solid #3d2a5e;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tr:hover {
+    background: rgba(124, 77, 255, 0.1);
+}
+
+
+
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .main-tabs {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .search-container{
+        flex-direction: column;
+    }
+    
+    /* Кнопка найти */
+    .search-button {
+        max-width: 100%;
+        padding: 12px;
+    }
+
+    /* Размер шрифта таблиц */
+    .data-table th{
+        font-size: 0.9rem;
+        
+    }
+
+    .data-table td{
+        font-size: 0.8rem;
+    }
+}
+
+/* Стили для модального окна команды и игры */
+.team-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: none;
+}
+
+.team-modal.active {
+    display: block;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    background: #1f0f3a;
+    border-radius: 12px;
+    padding: 25px;
+    overflow-y: auto;
+    border: 1px solid #3d2a5e;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.close-modal:hover {
+    color: #7c4dff;
+}
+
+.team-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 20px;
+    padding-left: 10px;
+}
+
+.team-name {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.team-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px; 
+    margin-top: -5px;
+}
+
+.team-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.team-meta .city {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #d1c4e9; 
+}
+
+.team-meta .last-game {
+    font-size: 0.9rem;
+    color: #b39ddb; 
+}
+
+/* СТатистика под именем */
+.stats{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 5px solid #3d2a5e;
+    border-radius: 5px;
+}
+
+.stat-card{
+    display: flex;
+    flex: 1;
+    background: #2a1745;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #3d2a5e;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #b39ddb;
+}
+/* Секция достижений */
+.achievements-section {
+    padding-bottom: 30px;
+    border-bottom: 5px solid #3d2a5e;
+    border-radius: 5px;
+}
+
+.achievements-section h3 {
+    justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Основные турниры  */
+.tournament-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #3d2a5e;
+}
+
+.tournament-row:last-child {
+    border-bottom: none;
+}
+
+.tournament-name {
+    font-weight: bold;
+    color: white;
+    flex: 1;
+    font-size: 0.85rem;
+}
+
+.tournament-stats {
+    display: flex;
+    gap: 15px;
+}
+
+.tournament-stats span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.gold {
+    color: #FFD700;
+}
+
+.silver {
+    color: #C0C0C0;
+}
+
+.bronze {
+    color: #CD7F32;
+}
+
+.game{
+    color: #b39ddb;
+}
+
+.tournament-info{
+
+    color: white;
+    flex: 1;
+    font-size: 1rem;
+}
+
+
+/* История игр */
+.history-table {
+    margin-top: 25px;
+}
+
+.history-table h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #3d2a5e;
+}
+
+.history-table th {
+    background: #2a1745;
+    color: #d1c4e9;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.history-table td {
+    color: white;
+    font-size: 0.9rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .team-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .tournament-stats{
+        padding: 0 10px;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+
+
+/* ИГРЫ */
+/* Стили для модального окна игры */
+.game-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: none;
+}
+
+.game-modal.active {
+    display: block;
+}
+
+.modal-content.game{
+    max-width: 1000px;
+}
+
+.game-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #3d2a5e;
+}
+
+.game-title {
+    font-size: 1.8rem;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.game-meta {
+    display: flex;
+    gap: 20px;
+    color: #b39ddb;
+    flex-wrap: wrap;
+}
+
+.game-meta span {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Детальная таблица результатов */
+.detailed-results {
+    margin: 25px 0;
+    overflow-x: auto;
+}
+
+.detailed-results h3 {
+    margin-bottom: 15px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.2rem;
+}
+
+.excel-style-table-container {
+    margin: 0 auto 20px auto;
+    max-width: 100%;
+}
+
+.excel-style-table {
+    width: auto;
+    border-collapse: collapse;
+    font-size: 1rem;
+    margin: 0 auto;
+    white-space: nowrap;
+}
+
+.excel-style-table th {
+    background: #2a1745;
+    padding: 10px 8px;
+    text-align: center;
+    color: #d1c4e9;
+    border: 1px solid #4a376b;
+    white-space: nowrap;
+}
+
+.excel-style-table th.result {
+    border: 2px solid #5a3f8b;
+    background: rgba(90, 63, 139, 0.15);
+}
+
+.excel-style-table td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #4a376b;
+    color: white;
+}
+
+.excel-style-table td.result {
+    border: 2px solid #5a3f8b;
+    background: rgba(90, 63, 139, 0.15);
+}
+
+.excel-style-table tr:hover {
+    background: rgba(124, 77, 255, 0.1);
+}
+
+/* Информация об игре */
+.game-info {
+    background: #2a1745;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #3d2a5e;
+}
+
+.game-info h3 {
+    margin-bottom: 15px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+}
+
+.game-info p{
+    font-size: 0.8rem;
+}
+
+
+
+/* Убрать возможно придется */
+.topics-section ul {
+    padding-left: 20px;
+    font-size: 0.8rem;
+}
+
+.topics-section li {
+    color: white;
+    margin-bottom: 5px;
+}
+
+/* Адаптивность для таблицы */
+@media (max-width: 1024px) {
+    .excel-style-table {
+        width: 100%;
+        font-size: 0.8rem;
+    }
+    
+    .excel-style-table th,
+    .excel-style-table td {
+        padding: 8px 5px;
+
+    }
+}
+
+@media (max-width: 768px) {
+    .excel-style-table {
+        width: 100%;
+        font-size: 0.8rem;
+    }
+    
+    .excel-style-table th,
+    .excel-style-table td {
+        padding: 8px 4px;
+
+    }
+    .game-meta {
+        gap: 10px;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .excel-style-table {
+        font-size: 0.7rem;
+    }
+    
+    .excel-style-table th,
+    .excel-style-table td {
+        padding: 4px 3px;
+    }
+}
+
+
+/* Стили для состояния загрузки и ошибок */
+.loading {
+    text-align: center;
+    padding: 50px;
+    color: #b39ddb;
+    font-size: 1.2rem;
+}
+
+.error {
+    text-align: center;
+    padding: 50px;
+    color: #ff6b6b;
+    font-size: 1.2rem;
+}
+
+/* Стили для "История последних игр" */
+.gold { color: #FFD700; font-weight: bold; }
+.silver { color: #C0C0C0; font-weight: bold; }  
+.bronze { color: #CD7F32; font-weight: bold; }
+
+
+
+/* ============================================= */
+/* ИСПРАВЛЕНИЕ ОТСТУПОВ ПРИ AJAX ФИЛЬТРАЦИИ */
+/* ============================================= */
+
+/* Убираем лишние отступы у контейнера таблиц */
+.table-content {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Исправляем отступы для загрузки и ошибок */
+.table-content > .loading,
+.table-content > .error {
+    padding: 50px;
+    text-align: center;
+    margin: 0;
+}
+
+/* Убедимся, что таблицы не имеют лишних отступов */
+.table-wrapper {
+    margin: 0;
+    padding: 20px;
+}
+
+/* Фиксируем отступ между панелью управления и таблицами */
+.control-panel + .table-content {
+    margin-top: 25px;
+}
+
+/* Убираем возможные двойные отступы после AJAX */
+#ajax-content > .table-wrapper {
+    margin: 0;
+    padding: 0;
+}
+
+/* Исправляем отступы для вложенных таблиц */
+#ajax-content .table-wrapper {
+    padding: 20px;
+}
+
+/* Гарантируем, что не будет лишних отступов */
+#ajax-content > * {
+    margin: 0;
+    padding: 0;
+}
+
+#ajax-content > .table-wrapper > * {
+    margin: 0;
+    padding: 0;
+}
+
+/* Исправляем для мобильных */
+@media (max-width: 768px) {
+    .table-wrapper {
+        padding: 15px;
+    }
+    
+    #ajax-content .table-wrapper {
+        padding: 15px;
+    }
+    
+    .table-content > .loading,
+    .table-content > .error {
+        padding: 30px;
+    }
+}
