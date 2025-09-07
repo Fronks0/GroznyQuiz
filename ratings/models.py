@@ -20,16 +20,6 @@ class TeamQuerySet(models.QuerySet):
                 output_field=FloatField()
             )
         )
-    
-    def with_series_stats(self):
-        return self.annotate(
-        participations=Count('id'),
-        wins=Count('id', filter=Q(place=1)),
-        second_places=Count('id', filter=Q(place=2)),
-        third_places=Count('id', filter=Q(place=3)),
-    ).order_by('tournament__series__name')
-
-
 
 
 
@@ -123,14 +113,16 @@ class Team(models.Model):
     # Подсчеты для секции "Достижения"
     def get_series_stats(self):
         return self.gameresult_set.values(
-            'tournament__series__name'
+            'tournament__series__name',
+            'tournament__series__display_order'
         ).annotate(
             participations=Count('id'),
             wins=Count('id', filter=Q(place=1)),
             second_places=Count('id', filter=Q(place=2)),
             third_places=Count('id', filter=Q(place=3)),
-        ).order_by('tournament__series__name')
+        ).order_by('tournament__series__display_order') 
 
+        
 
     #Лучшай тема на основе очков
     @property

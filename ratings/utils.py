@@ -1,37 +1,58 @@
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.db.models import Q
 from .models import Team, Tournament
 
-from django.db.models import Q
-
-
 def q_search(query):
-    query = query.strip()
     if not query:
-        return {'teams': Team.objects.none(), 'tournaments': Tournament.objects.none()}
+        return {
+            'teams': Team.objects.all(),
+            'tournaments': Tournament.objects.all()
+        }
     
-    # Используем websearch для лучшей обработки дефисов и фраз
-    search_query = SearchQuery(query, search_type='websearch')
+    # Нормализуем запрос - убираем лишние пробелы и приводим к нижнему регистру
+    normalized_query = ' '.join(query.lower().split())
     
-    # ПОИСК ПО КОМАНДАМ
-    teams = Team.objects.annotate(
-        rank=SearchRank(SearchVector('name'), search_query)
-    ).filter(
-        Q(rank__gt=0) |  # полнотекстовый поиск
-        Q(name__icontains=query)  # обычный поиск для точных совпадений
-    ).order_by('-rank', 'name')
+    # Создаем условия для поиска команд
+    team_conditions = Q()
     
-    # ПОИСК ПО ТУРНИРАМ (включая команды-участники)
-    tournaments = Tournament.objects.annotate(
-        rank=SearchRank(
-            SearchVector('name') + 
-            SearchVector('gameresult__team__name'),  # ← поиск по командам тоже
-            search_query
-        )
-    ).filter(
-        Q(rank__gt=0) |
-        Q(name__icontains=query) |
-        Q(gameresult__team__name__icontains=query)  # ← поиск по названиям команд
-    ).distinct().order_by('-rank', '-date')
+    # Ищем точное совпадение (без учета регистра)
+    team_conditions |= Q(name__iexact=normalized_query)
+    
+    # Ищем совпадение начала названия
+    team_conditions |= Q(name__istartswith=normalized_query)
+    
+    # Ищем совпадение любой части названия
+    team_conditions |= Q(name__icontains=normalized_query)
+    
+    # Для запросов из нескольких слов ищем совпадение всех слов
+    words = normalized_query.split()
+    if len(words) > 1:
+        # Ищем команды, которые содержат все слова из запроса
+        all_words_condition = Q()
+        for word in words:
+            all_words_condition &= Q(name__icontains=word)
+        team_conditions |= all_words_condition
+        
+        # Ищем команды, которые начинаются с первого слова
+        team_conditions |= Q(name__istartswith=words[0])
+    
+    # Поиск для турниров
+    tournament_conditions = Q()
+    tournament_conditions |= Q(name__icontains=normalized_query)
+    tournament_conditions |= Q(name__iexact=normalized_query)
+    tournament_conditions |= Q(name__istartswith=normalized_query)
+    
+    # Также ищем по командам-участникам турнира
+    tournament_conditions |= Q(gameresult__team__name__icontains=normalized_query)
+    
+    # Для запросов из нескольких слов
+    if len(words) > 1:
+        all_words_tournament = Q()
+        for word in words:
+            all_words_tournament &= (Q(name__icontains=word) | Q(gameresult__team__name__icontains=word))
+        tournament_conditions |= all_words_tournament
+    
+    teams = Team.objects.filter(team_conditions).distinct()
+    tournaments = Tournament.objects.filter(tournament_conditions).distinct()
     
     return {
         'teams': teams,

@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 
 from .utils import q_search
 
-# Доделать поиск.
+
 # "Показать еще"(ограничить показываемую информацию)
 # "Закрепить "thead" Турнирной таблицы при скроле.
 # телефонное отоброжение настроить
@@ -17,48 +17,50 @@ from .utils import q_search
 
 
 def index(request):
-    # ПОЛУЧЕНИЕ ПАРАМЕТРОВ
+    # ПОЛУЧЕНИЕ ПАРАМЕТРОВ из URL
     search_query = request.GET.get('search', '')
     city = request.GET.get('city')
-    # Фильтры для команд (сортировка)
     team_sort = request.GET.get('team_sort')
-    # Фильтры для игр (по серии турниров)
     game_series = request.GET.get('game_series')
-    # Какая страница активна (вкладка "Команды" или "Игры")
-    active_tab = request.GET.get('active_tab', 'teams') # По умолчанию "teams"
-
-    # Фиильтры дат
+    active_tab = request.GET.get('active_tab', 'teams')
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
 
-    # Базовые queryset для команд и турниров
-    teams = Team.objects.select_related('city')
+    # Базовые queryset для команд и турниров (еще без фильтров)
+    teams = Team.objects.select_related('city')  # Оптимизация: сразу подгружаем город
     tournaments = Tournament.objects.select_related('series', 'city').prefetch_related(
-        # Подгружаем еще победителя турнира и сохраняем его в дополнительном свойстве winners
+        # Prefetch для победителей турнира (команды с 1 местом)
         Prefetch(
             'gameresult_set',
             queryset=GameResult.objects.filter(place=1).select_related('team'),
-            to_attr='winners' #Сохраняем все в winners
+            to_attr='winners'  # Сохраняем в отдельное поле winners
         )
-    # Подгружаем "Число команд" в дополнительное свойство
     ).annotate(
-        results_count=Count('gameresult', distinct=True)
+        results_count=Count('gameresult', distinct=True)  # Считаем количество команд-участников
     )
 
-    # ПОИСК
+    # ПОИСК - применяем первым, но сохраняя аннотации
     if search_query:
-        results = q_search(search_query)
-        teams = results['teams']
-        tournaments = results['tournaments']
-   
-        # ФИЛЬТРАЦИЯ ПО ДАТЕ
+        # Получаем ID найденных команд и турниров
+        search_results = q_search(search_query)
+        
+        # Фильтруем базовые queryset по найденным ID (сохраняем аннотации!)
+        team_ids = search_results['teams'].values_list('id', flat=True)
+        tournament_ids = search_results['tournaments'].values_list('id', flat=True)
+        
+        teams = teams.filter(id__in=team_ids)
+        tournaments = tournaments.filter(id__in=tournament_ids)
+    
+    # ФИЛЬТРАЦИЯ ПО ДАТЕ - применяем после поиска
     if date_from:
         try:
             date_from_obj = datetime.strptime(date_from, '%Y-%m-%d')
+            # Для команд: фильтруем по дате турниров, в которых они участвовали
             teams = teams.filter(gameresult__tournament__date__gte=date_from_obj)
+            # Для турниров: фильтруем по прямой дате
             tournaments = tournaments.filter(date__gte=date_from_obj)
         except (ValueError, TypeError):
-            pass
+            pass  # Если дата некорректная - игнорируем фильтр
 
     if date_to:
         try:
@@ -68,49 +70,49 @@ def index(request):
         except (ValueError, TypeError):
             pass
 
-    # Убираем дубликаты если применялись оба фильтра дат
+    # Убираем дубликаты команд (могут появиться из-за фильтрации по дате через related field)
     if date_from and date_to:
         teams = teams.distinct()
 
-    # ФИЛЬТРАЦИЯ ПО ГОРОДУ 
+    # ФИЛЬТРАЦИЯ ПО ГОРОДУ
     if city:
         teams = teams.filter(city__name=city)
         tournaments = tournaments.filter(city__name=city)
 
+    # Считаем статистику команд ПОСЛЕ всех фильтров (важно для корректных расчетов!)
     teams = teams.with_stats()
 
-    # СОРТИРОВКА КОМАНД 
+    # СОРТИРОВКА КОМАНД по выбранному критерию
     if team_sort == "wins":
-        teams = teams.order_by('-wins_count')
+        teams = teams.order_by('-wins_count')  # По количеству побед
     elif team_sort == "avg":
-        teams = teams.order_by('-avg_points')
+        teams = teams.order_by('-avg_points')  # По среднему баллу
     else:
-        teams = teams.order_by('-total_points_sum')
+        teams = teams.order_by('-total_points_sum')  # По умолчанию: по общему количеству очков
 
-    # ФИЛЬТРАЦИЯ ПО СЕРИИ ТУРНИРОВ 
+    # ФИЛЬТРАЦИЯ ПО СЕРИИ ТУРНИРОВ
     if game_series:
         tournaments = tournaments.filter(series__name=game_series)
 
-    # ФИНАЛЬНАЯ СОРТИРОВКА 
+    # ФИНАЛЬНАЯ СОРТИРОВКА турниров по дате (новые сверху)
     tournaments = tournaments.order_by('-date')
 
-    # КОНТЕКСТ
+    # ФОРМИРОВАНИЕ КОНТЕКСТА для шаблона
     context = {
         'teams': teams,
         'tournaments': tournaments,
-        'all_series': TournamentSeries.objects.all(),
-        'all_cities': City.objects.all().order_by('name'),
+        'all_series': TournamentSeries.objects.all(),  # Все серии для фильтра
+        'all_cities': City.objects.all().order_by('name'),  # Все города для фильтра
         'selected_city': city,
         'selected_team_sort': team_sort,
         'selected_game_series': game_series,
         'active_tab': active_tab,
-        'search_query': search_query,
+        'search_query': search_query,  # Сохраняем запрос для отображения в поле поиска
     }
     
-    # Если это AJAX запрос - возвращаем только таблицы
+    # Обработка AJAX запросов (только таблицы) vs обычных запросов (полная страница)
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request, 'ratings/includes/tables.html', context)
-        # Если обычный запрос - возвращаем полную страницу
     return render(request, 'ratings/index.html', context)
 
 
@@ -123,7 +125,7 @@ def team_modal(request, team_id):
         'tournament', 'tournament__city'
     ).order_by('-tournament__date')[:5]
     
-    # Получаем Статистику в "Достижения" из метода в Team 
+    # Получаем Статистику в "Достижения" из метода который в Team 
     series_stats = team.get_series_stats()
 
     
@@ -148,9 +150,6 @@ def game_modal(request, game_id):
         .select_related('team')\
         .prefetch_related('topicresult_set__topic')\
         .order_by('place')
-    
-    # Подгружаем topicresult_set
-    results = results.prefetch_related('topicresult_set__topic')
     
 
     # Заполняет незаполненные поля в таблице(для незаполненных тем в результате, делаем прочерки)
