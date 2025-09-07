@@ -10,7 +10,7 @@ class TeamQuerySet(models.QuerySet):
     def with_stats(self):
         return self.annotate(
             games_played_count=Count('gameresult', distinct=True),
-            wins_count=Count('achievements', filter=Q(achievements__place=1)),
+            wins_count=Count('gameresult', filter=Q(gameresult__place=1), distinct=True),
             total_points_sum=Coalesce(Sum('gameresult__total_points', distinct=True), 0.0, output_field=FloatField()),
             last_game_date=Max('gameresult__tournament__date') 
         ).annotate(
@@ -20,17 +20,17 @@ class TeamQuerySet(models.QuerySet):
                 output_field=FloatField()
             )
         )
-
-
-class GameResultQuerySet(models.QuerySet):
-    def with_dynamic_place(self):
-        # Добавляет динамическое место в турнире(game_modal) с учетом одинаковых очков
+    
+    def with_series_stats(self):
         return self.annotate(
-            dynamic_place=Window(
-                expression=DenseRank(),  # DenseRank учитывает ничьи (1,2,2,3)
-                order_by=F('total_points').desc()  # Сортировка по убыванию очков
-            )
-        )
+        participations=Count('id'),
+        wins=Count('id', filter=Q(place=1)),
+        second_places=Count('id', filter=Q(place=2)),
+        third_places=Count('id', filter=Q(place=3)),
+    ).order_by('tournament__series__name')
+
+
+
 
 
 #Город
@@ -120,6 +120,17 @@ class Team(models.Model):
         verbose_name = "Команда"
         verbose_name_plural = "Команды"
 
+    # Подсчеты для секции "Достижения"
+    def get_series_stats(self):
+        return self.gameresult_set.values(
+            'tournament__series__name'
+        ).annotate(
+            participations=Count('id'),
+            wins=Count('id', filter=Q(place=1)),
+            second_places=Count('id', filter=Q(place=2)),
+            third_places=Count('id', filter=Q(place=3)),
+        ).order_by('tournament__series__name')
+
 
     #Лучшай тема на основе очков
     @property
@@ -140,6 +151,7 @@ class Team(models.Model):
             }
         return {'short_name': '-', 'full_name': 'Нет данных'}
 
+
     def __str__(self):
         return f"{self.name} ({self.city})"
 
@@ -151,8 +163,9 @@ class GameResult(models.Model):
     black_box_points = models.DecimalField(max_digits=6, decimal_places=1, default=Decimal('0.0'), verbose_name="Очки за черный ящик")
     # Сигналы подсчитывают total_points
     total_points = models.FloatField(default=0.0, verbose_name="Всего очков")
+    # Сигналы подсчитывают points
+    place = models.PositiveIntegerField(default=0, verbose_name="Место в турнире")
 
-    objects = GameResultQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Результат игры"
@@ -198,28 +211,6 @@ class TopicResult(models.Model):
     
     def __str__(self):
         return f"{self.game_result} - {self.topic}: {self.points}"
-
-
-
-class Achievement(models.Model):
-    PLACE_CHOICES = [
-        (1, '🥇 1 место'),
-        (2, '🥈 2 место'), 
-        (3, '🥉 3 место'),
-    ]
-    
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='achievements')
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='achievements')
-    place = models.PositiveIntegerField(choices=PLACE_CHOICES)
-    achieved_date = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        unique_together = ['team', 'tournament']
-        ordering = ['tournament__date', 'place']
-
-    def __str__(self):
-        return f"{self.team} - {self.tournament} ({self.get_place_display()})"
-
 
 
 

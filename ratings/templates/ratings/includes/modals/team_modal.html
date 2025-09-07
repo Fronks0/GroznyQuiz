@@ -1,5 +1,4 @@
 <!-- Модальное окно с детальной информацией о команде -->
-
 <button class="close-modal">&times;</button>
 <div class="team-header">
     <div class="team-info">
@@ -35,19 +34,19 @@
 <div class="achievements-section">
     <h3><i class="fas fa-trophy"></i> Достижения</h3>
     
-    {% for achievement in achievements %}
+    {% for stat in series_stats %}  
     <div class="tournament-row">
-        <div class="tournament-name">{{ achievement.tournament__series__name }}</div>
+        <div class="tournament-name">{{ stat.tournament__series__name }}</div>  
         <div class="tournament-stats">
-            <span class="game">Участий: {{ achievement.participations }}</span>
-            {% if achievement.gold > 0 %}
-            <span class="gold"><i class="fas fa-trophy"></i> {{ achievement.gold }}</span>
+            <span class="game">Участий: {{ stat.participations }}</span>  
+            {% if stat.wins > 0 %}
+            <span class="gold"><i class="fas fa-trophy"></i> {{ stat.wins }}</span>  
             {% endif %}
-            {% if achievement.silver > 0 %}
-            <span class="silver"><i class="fas fa-medal"></i> {{ achievement.silver }}</span>
+            {% if stat.second_places > 0 %}
+            <span class="silver"><i class="fas fa-medal"></i> {{ stat.second_places }}</span>  
             {% endif %}
-            {% if achievement.bronze > 0 %}
-            <span class="bronze"><i class="fas fa-medal"></i> {{ achievement.bronze }}</span>
+            {% if stat.third_places > 0 %}
+            <span class="bronze"><i class="fas fa-medal"></i> {{ stat.third_places }}</span>  
             {% endif %}
         </div>
     </div>
@@ -64,7 +63,7 @@
             <tr>
                 <th>Дата</th>
                 <th>Турнир</th>
-                {% comment %} <th>Место</th> {% endcomment %}
+                <th>Место</th>
                 <th>Очки</th>
             </tr>
         </thead>
@@ -73,15 +72,15 @@
             <tr>
                 <td>{{ result.tournament.date|date:"d.m.Y" }}</td>
                 <td>{{ result.tournament.name }}</td>
-                {% comment %} <td>
-                    {% if result.dynamic_place <= 3 %}
-                        <span class="{% if result.dynamic_place == 1 %}gold{% elif result.dynamic_place == 2 %}silver{% else %}bronze{% endif %}">
-                            {{ result.dynamic_place }}
+                <td>
+                    {% if result.place <= 3 %}  
+                        <span class="{% if result.place == 1 %}gold{% elif result.place == 2 %}silver{% else %}bronze{% endif %}">
+                            {{ result.place }}  
                         </span>
                     {% else %}
-                        {{ result.dynamic_place }}
+                        {{ result.place }}  
                     {% endif %}
-                </td> {% endcomment %}
+                </td>
                 <td>{{ result.total_points|floatformat:"-1" }}</td>
             </tr>
             {% empty %}

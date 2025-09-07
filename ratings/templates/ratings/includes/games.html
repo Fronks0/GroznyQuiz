@@ -18,9 +18,9 @@
                 <td>{{ tournament.name }}</td>
                 <td>{{ tournament.results_count }}</td>
                 <td>
-                    {% if tournament.winner_achievements %}
-                        {% for achievement in tournament.winner_achievements %}
-                            {{ achievement.team.name }}{% if not forloop.last %}, {% endif %}
+                    {% if tournament.winners %}
+                        {% for winner in tournament.winners %}
+                            {{ winner.team.name }}
                         {% endfor %}
                     {% else %}
                         -

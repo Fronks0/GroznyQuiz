@@ -36,7 +36,7 @@
                 <tbody>
                     {% for result in results %}
                     <tr>
-                        <td>{{ result.dynamic_place }}</td>  <!-- Динамическое место -->
+                        <td>{{ result.place }}</td>
                         <td>{{ result.team.name }}</td>
                         {% for points in result.topic_points|slice:":3" %}
                             <td>

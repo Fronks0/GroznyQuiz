@@ -1,17 +1,20 @@
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render
-from .models import Achievement, City, GameResult,Team, Tournament, TournamentSeries
+from .models import City, GameResult,Team, Tournament, TournamentSeries
 from django.db.models import Count, Q
 from django.db.models import Prefetch
 
 from .utils import q_search
 
-# поиск
+# Доделать поиск.
 # "Показать еще"(ограничить показываемую информацию)
 # "Закрепить "thead" Турнирной таблицы при скроле.
-#телефонное отоброжение настроить
+# телефонное отоброжение настроить
+# Убрать Header и сделать "Вернуться на сайт"
 # Кеширование
 # Оптимизация запросов
+# Добавление данных в проект настроить.
+
 
 def index(request):
     # ПОЛУЧЕНИЕ ПАРАМЕТРОВ
@@ -31,21 +34,18 @@ def index(request):
     # Базовые queryset для команд и турниров
     teams = Team.objects.select_related('city')
     tournaments = Tournament.objects.select_related('series', 'city').prefetch_related(
-    Prefetch(
-        'gameresult_set',
-        queryset=GameResult.objects.select_related('team'),
-        to_attr='results'
-    ),
-    Prefetch(
-        'achievements',
-        queryset=Achievement.objects.filter(place=1).select_related('team'),
-        to_attr='winner_achievements'
-    )
+        # Подгружаем еще победителя турнира и сохраняем его в дополнительном свойстве winners
+        Prefetch(
+            'gameresult_set',
+            queryset=GameResult.objects.filter(place=1).select_related('team'),
+            to_attr='winners' #Сохраняем все в winners
+        )
+    # Подгружаем "Число команд" в дополнительное свойство
     ).annotate(
         results_count=Count('gameresult', distinct=True)
     )
 
-    # ПОИСК (ВЫСШИЙ ПРИОРИТЕТ)
+    # ПОИСК
     if search_query:
         results = q_search(search_query)
         teams = results['teams']
@@ -116,30 +116,25 @@ def index(request):
 
 
 def team_modal(request, team_id):
+    # Получаем конкретную команду
     team = Team.objects.with_stats().select_related('city').get(id=team_id)
-    
-    # 1. Последние игры с динамическими местами
+    #Получаем результаты последних 5 игр
     recent_games = team.gameresult_set.select_related(
         'tournament', 'tournament__city'
-    ).with_dynamic_place().order_by('-tournament__date')[:5]
+    ).order_by('-tournament__date')[:5]
     
-    # Подссчитываем достижения из модели достижений
-    achievements = Achievement.objects.filter(team=team).values(
-        'tournament__series__name'
-    ).annotate(
-        participations=Count('id'),
-        gold=Count('id', filter=Q(place=1)),
-        silver=Count('id', filter=Q(place=2)),
-        bronze=Count('id', filter=Q(place=3)),
-    ).order_by('tournament__series__name')
+    # Получаем Статистику в "Достижения" из метода в Team 
+    series_stats = team.get_series_stats()
+
     
     context = {
         'team': team,
         'best_topic': team.best_topic,
-        'achievements': achievements,
+        'series_stats': series_stats,
         'recent_games': recent_games
     }
     return render(request, 'ratings/includes/modals/team_modal.html', context)
+
 
 
 def game_modal(request, game_id):
@@ -151,8 +146,8 @@ def game_modal(request, game_id):
     # Получаем результаты с динамическими местами + оптимизированные запросы
     results = GameResult.objects.filter(tournament=tournament)\
         .select_related('team')\
-        .with_dynamic_place()\
-        .order_by('dynamic_place')
+        .prefetch_related('topicresult_set__topic')\
+        .order_by('place')
     
     # Подгружаем topicresult_set
     results = results.prefetch_related('topicresult_set__topic')
