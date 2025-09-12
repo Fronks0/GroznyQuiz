@@ -1,5 +1,7 @@
 <!-- ТОЛЬКО таблицы для AJAX -->
 
+{% load url_helpers %}
+
 <div id="teams-table" class="table-wrapper {% if active_tab == 'teams' %}active{% endif %}">
     {% include "ratings/includes/teams.html" %}
 </div>

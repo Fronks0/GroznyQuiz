@@ -33,6 +33,8 @@
             <input type="hidden" name="active_tab" id="active_tab" value="teams">
             {% comment %} Скрытое поле для поиска, чтоб работал вместе с фильтрами {% endcomment %}
             <input type="hidden" name="search" value="{{ search_query }}">
+            {% comment %} Скрытое поле для пагинации {% endcomment %}
+            <input type="hidden" name="page" value="{{ page_obj.number }}">
             <!-- Общие фильтры -->
             <div class="filter-box">
                 <label><i class="fas fa-location-dot"></i> Город:</label>

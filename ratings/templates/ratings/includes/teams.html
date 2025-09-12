@@ -15,7 +15,7 @@
         <tbody>
             {% for team in teams %}
                 <tr class="team-row" data-team-id="{{ team.id }}">
-                    <td>{{ forloop.counter }}</td>
+                    <td>{{ forloop.counter0|add:teams.start_index }}</td>
                     <td>{{ team.name }}</td>
                     <td>{{ team.city.name }}</td>
                     <td>{{ team.games_played_count|default:0 }}</td>
@@ -30,5 +30,34 @@
             {% endfor %}
         </tbody>
     </table>
+
+    {% load url_helpers %}
+    {% if page_obj.paginator.num_pages > 1 %}  <!-- Используем page_obj -->
+    <div class="pagination-wrapper">
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-arrow">
+                    <
+                </a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="pagination-btn active">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-btn">
+                        {{ num }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-arrow">
+                    >
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 

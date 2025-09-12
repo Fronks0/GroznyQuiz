@@ -8,11 +8,63 @@ document.addEventListener('DOMContentLoaded', function() {
     const gameModal = document.getElementById('gameModal');
     
     // =============================================
-    // 1. БУРГЕР-МЕНЮ
+    // ПАГИНАЦИЯ
+    // =============================================
+
+    /**
+     * Обработчик клика по пагинации
+     * Предотвращает стандартное поведение и загружает страницу через AJAX
+     */
+    function setupPaginationHandlers() {
+        document.querySelectorAll('.pagination a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Извлекаем номер страницы из URL
+                const url = new URL(this.href);
+                const page = url.searchParams.get('page');
+                
+                // Обновляем скрытое поле page в форме
+                const pageInput = document.querySelector('input[name="page"]');
+                if (pageInput) {
+                    pageInput.value = page;
+                } else {
+                    // Создаем скрытое поле если его нет
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'page';
+                    hiddenInput.value = page;
+                    document.getElementById('filters').appendChild(hiddenInput);
+                }
+                
+                // Загружаем контент с новой страницей
+                const activeTab = document.querySelector('.main-tab.active').getAttribute('data-tab');
+                loadTabContent(activeTab);
+            });
+        });
+    }
+
+/**
+ * Удаляет параметр page из формы после загрузки
+ * чтобы при следующих фильтрациях не сохранялся старый номер страницы
+ */
+function cleanupPageParam() {
+    const pageInput = document.querySelector('input[name="page"]');
+    if (pageInput) {
+        pageInput.remove();
+    }
+}
+    
+    // =============================================
+    // 1. БУРГЕР-МЕНЮ (для основной навигации сайта)
     // =============================================
     const navToggle = document.querySelector('.nav-btn');
     const navBar = document.querySelector('.navbar');
 
+    /**
+     * Закрывает бургер-меню на мобильных устройствах
+     * Убирает активные классы и восстанавливает прокрутку body
+     */
     function closeMenu() {
         if (navBar && navToggle) {
             navBar.classList.remove('active');
@@ -21,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Обработчик клика по бургер-кнопке
     if (navToggle && navBar) {
         navToggle.addEventListener('click', function() {
             navBar.classList.toggle('active');
@@ -29,23 +82,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Закрытие меню при ресайзе окна и на десктопе
     window.addEventListener('resize', closeMenu);
     if (window.innerWidth >= 768) closeMenu();
 
     // =============================================
     // 2. ФУНКЦИИ ДЛЯ МОДАЛОК
     // =============================================
+    
+    /**
+     * Показывает модальное окно с индикатором загрузки
+     * @param {HTMLElement} modal - DOM-элемент модального окна
+     * @param {string} message - Сообщение для отображения во время загрузки
+     */
     function showModalWithLoader(modal, message) {
         modal.querySelector('.modal-content').innerHTML = `<div class="loading">${message}</div>`;
         modal.classList.add('active');
         body.style.overflow = 'hidden';
     }
 
+    /**
+     * Скрывает модальное окно и восстанавливает прокрутку страницы
+     * @param {HTMLElement} modal - DOM-элемент модального окна
+     */
     function hideModal(modal) {
         modal.classList.remove('active');
         body.style.overflow = '';
     }
 
+    /**
+     * Показывает сообщение об ошибке в модальном окне
+     * @param {HTMLElement} modal - DOM-элемент модального окна
+     * @param {string} message - Текст ошибки
+     */
     function showError(modal, message) {
         modal.querySelector('.modal-content').innerHTML = `<div class="error">${message}</div>`;
     }
@@ -53,16 +122,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
     // 3. ФУНКЦИИ ДЛЯ ФИЛЬТРОВ
     // =============================================
+    
+    /**
+     * Показывает только фильтры, относящиеся к вкладке "Команды"
+     * Скрывает фильтры для игр
+     */
     function showTeamFilters() {
         document.querySelectorAll('.team-only').forEach(el => el.style.display = "block");
         document.querySelectorAll('.game-only').forEach(el => el.style.display = "none");
     }
 
+    /**
+     * Показывает только фильтры, относящиеся к вкладке "Игры"
+     * Скрывает фильтры для команд
+     */
     function showGameFilters() {
         document.querySelectorAll('.team-only').forEach(el => el.style.display = "none");
         document.querySelectorAll('.game-only').forEach(el => el.style.display = "block");
     }
 
+    /**
+     * Обновляет видимость фильтров в зависимости от активной вкладки
+     * Вызывается при переключении вкладок и инициализации
+     */
     function updateFilterVisibility() {
         const activeTab = document.getElementById('active_tab').value;
         if (activeTab === 'teams') showTeamFilters();
@@ -72,6 +154,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
     // 4. AJAX ДЛЯ МОДАЛОК
     // =============================================
+    
+    /**
+     * Загружает содержимое модального окна для команды через AJAX
+     * @param {number} teamId - ID команды для загрузки
+     */
     function loadTeamModal(teamId) {
         showModalWithLoader(teamModal, 'Загрузка данных команды...');
         fetch(`/team/${teamId}/modal/`)
@@ -80,6 +167,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => showError(teamModal, `Ошибка загрузки команды: ${error}`));
     }
 
+    /**
+     * Загружает содержимое модального окна для игры через AJAX
+     * @param {number} gameId - ID игры для загрузки
+     */
     function loadGameModal(gameId) {
         showModalWithLoader(gameModal, 'Загрузка данных игры...');
         fetch(`/game/${gameId}/modal/`)
@@ -88,43 +179,62 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => showError(gameModal, `Ошибка загрузки игры: ${error}`));
     }
 
-// =============================================
-// 5. ОБРАБОТЧИКИ СОБЫТИЙ
-// =============================================
-function attachEventHandlers() {
-    // ТОЛЬКО обработчики для строк таблиц (они обновляются при AJAX)
-    document.querySelectorAll('.team-row').forEach(row => {
-        row.addEventListener('click', () => loadTeamModal(row.getAttribute('data-team-id')));
-    });
+    // =============================================
+    // 5. ОБРАБОТЧИКИ СОБЫТИЙ
+    // =============================================
     
-    document.querySelectorAll('.game-row').forEach(row => {
-        row.addEventListener('click', () => loadGameModal(row.getAttribute('data-game-id')));
-    });
-}
-
+    /**
+     * Привязывает обработчики событий к элементам
+     * Особенно важно вызывать после AJAX-обновления таблиц,
+     * так как старые элементы заменяются новыми
+     */
+    function attachEventHandlers() {
+        // Обработчики для строк таблиц (обновляются при AJAX)
+        document.querySelectorAll('.team-row').forEach(row => {
+            row.addEventListener('click', () => loadTeamModal(row.getAttribute('data-team-id')));
+        });
+        
+        document.querySelectorAll('.game-row').forEach(row => {
+            row.addEventListener('click', () => loadGameModal(row.getAttribute('data-game-id')));
+        });
+    }
 
     // =============================================
     // 6. УПРАВЛЕНИЕ ВКЛАДКАМИ И AJAX
     // =============================================
-    function updateSearchInForm() {
-    const searchInput = document.getElementById('search-input');
-    const formSearch = document.querySelector('input[name="search"]');
     
-    if (searchInput && formSearch) {
-        formSearch.value = searchInput.value.trim();}
+    /**
+     * Синхронизирует значение поиска из видимого поля в скрытое поле формы
+     * Нужно потому что видимое поле поиска не находится внутри формы фильтров
+     */
+    function updateSearchInForm() {
+        const searchInput = document.getElementById('search-input');
+        const formSearch = document.querySelector('input[name="search"]');
+        
+        if (searchInput && formSearch) {
+            formSearch.value = searchInput.value.trim();
+        }
     }
 
+    /**
+     * Загружает контент для активной вкладки через AJAX
+     * Основная функция для обновления таблиц без перезагрузки страницы
+     */
     function loadActiveTabContent() {
         const activeTab = document.querySelector('.main-tab.active').getAttribute('data-tab');
         loadTabContent(activeTab);
     }
 
+    /**
+     * Переключает визуальное состояние вкладок и обновляет UI
+     * @param {string} tabName - Название вкладки ('teams' или 'games')
+     */
     function switchTab(tabName) {
-        // Обновляем визуально
+        // Обновляем визуально активную вкладку
         document.querySelectorAll('.main-tab').forEach(tab => tab.classList.remove('active'));
         document.querySelector(`.main-tab[data-tab="${tabName}"]`).classList.add('active');
         
-        // Обновляем скрытое поле
+        // Обновляем скрытое поле для отправки на сервер
         document.getElementById('active_tab').value = tabName;
         
         // Показываем соответствующую таблицу
@@ -133,16 +243,23 @@ function attachEventHandlers() {
             if (wrapper.id === tabName + '-table') wrapper.classList.add('active');
         });
         
-        // Переключаем фильтры
+        // Переключаем видимость фильтров
         updateFilterVisibility();
     }
 
+    /**
+     * Основная функция загрузки контента вкладки через AJAX
+     * @param {string} tabName - Название вкладки для загрузки
+     */
     function loadTabContent(tabName) {
         const tablesContainer = document.getElementById('ajax-content');
         tablesContainer.innerHTML = '<div class="loading">Загрузка...</div>';
-        
+
+        // Обновляем значение active_tab в форме перед отправкой
+        document.getElementById('active_tab').value = tabName;
+
         const formData = new FormData(document.getElementById('filters'));
-        
+
         fetch(`?${new URLSearchParams(formData)}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
@@ -151,6 +268,8 @@ function attachEventHandlers() {
             tablesContainer.innerHTML = html;
             switchTab(tabName);
             attachEventHandlers();
+            setupPaginationHandlers();
+            cleanupPageParam();
             cleanUrl();
         })
         .catch(error => {
@@ -159,9 +278,12 @@ function attachEventHandlers() {
         });
     }
 
+
     // =============================================
     // 7. ИНИЦИАЛИЗАЦИЯ ВКЛАДОК
     // =============================================
+    
+    // Обработчики клика по вкладкам "Команды" и "Игры"
     document.querySelectorAll('.main-tab').forEach(tab => {
         tab.addEventListener('click', function() {
             const tabName = this.getAttribute('data-tab');
@@ -176,23 +298,34 @@ function attachEventHandlers() {
     if (filterForm) {
         filterForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            updateSearchInForm();   // <<< сначала обновляем скрытое поле "search"
+            
+            // Сбрасываем пагинацию при изменении фильтров
+            const pageInput = document.querySelector('input[name="page"]');
+            if (pageInput) {
+                pageInput.value = 1;
+            }
+            
+            updateSearchInForm();
             const activeTab = document.querySelector('.main-tab.active').getAttribute('data-tab');
-            loadTabContent(activeTab); // загружаем контент с учетом поиска и фильтров
+            loadTabContent(activeTab);
         });
     }
 
     // =============================================
     // 9. ОБРАБОТЧИКИ ЗАКРЫТИЯ МОДАЛОК
     // =============================================
+    
+    // Закрытие модалок по клику на оверлей
     document.querySelectorAll('.modal-overlay').forEach(btn => {
         btn.addEventListener('click', () => { hideModal(teamModal); hideModal(gameModal); });
     });
 
+    // Закрытие модалок по клавише Escape
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') { hideModal(teamModal); hideModal(gameModal); }
     });
 
+    // Закрытие модалок по клику на кнопку закрытия
     document.addEventListener('click', e => {
         if (e.target.classList.contains('close-modal')) { hideModal(teamModal); hideModal(gameModal); }
     });
@@ -200,12 +333,17 @@ function attachEventHandlers() {
     // =============================================
     // 10. ОЧИСТКА URL
     // =============================================
+    
+    /**
+     * Очищает URL браузера от пустых GET-параметров
+     * Удаляет все параметры с пустыми значениями для красоты
+     */
     function cleanUrl() {
         const url = new URL(window.location);
         const params = new URLSearchParams(url.search);
         
         for (const [key, value] of params) {
-            if (value === '') params.delete(key);
+            if (value === '' || key === 'page') params.delete(key);
         }
         
         if (params.toString() !== url.searchParams.toString()) {
@@ -214,8 +352,12 @@ function attachEventHandlers() {
     }
 
     // =============================================
-// 12. ОБРАБОТЧИКИ ПОИСКА 
-// =============================================
+    // 11. ОБРАБОТЧИКИ ПОИСКА 
+    // =============================================
+    
+    /**
+     * Настраивает обработчики для поиска: кнопка, Enter, очистка
+     */
     function setupSearchHandlers() {
         const searchInput = document.getElementById('search-input');
         const searchButton = document.getElementById('search-button');
@@ -255,25 +397,27 @@ function attachEventHandlers() {
     }
 
     // =============================================
-    // 11. ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+    // 12. ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
     // =============================================
+    
+    // Первоначальная настройка при загрузке страницы
     attachEventHandlers();
+    setupPaginationHandlers()
     setupSearchHandlers();
     updateFilterVisibility();
     cleanUrl();
     
-
+    // Синхронизация поискового запроса при загрузке страницы
     if (document.getElementById('search-input') && document.querySelector('input[name="search"]')) {
         document.getElementById('search-input').value = document.querySelector('input[name="search"]').value;
     }
 });
 
+// =============================================
+// ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ФИЛЬТРА ДАТ
+// =============================================
 
-
-
-
-
-// Открытие/закрытие выпадающего меню
+// Открытие/закрытие выпадающего меню фильтра дат
 document.querySelectorAll('.period-toggle').forEach(button => {
     button.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -282,7 +426,7 @@ document.querySelectorAll('.period-toggle').forEach(button => {
     });
 });
 
-// Закрытие при клике вне области
+// Закрытие при клике вне области фильтра дат
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.period-filter')) {
         document.querySelectorAll('.period-fields').forEach(fields => {
@@ -291,7 +435,10 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Обновление текста кнопки при выборе дат
+/**
+ * Обновляет текст кнопки фильтра дат при выборе дат
+ * Показывает выбранный диапазон дат на кнопке
+ */
 function updatePeriodButton() {
     const dateFrom = document.querySelector('input[name="date_from"]');
     const dateTo = document.querySelector('input[name="date_to"]');
@@ -306,18 +453,20 @@ function updatePeriodButton() {
     }
 }
 
-// Слушаем изменения date input
+// Слушаем изменения date input для обновления кнопки
 document.querySelectorAll('input[type="date"]').forEach(input => {
     input.addEventListener('change', updatePeriodButton);
 });
 
-// Инициализация
+// Инициализация текста кнопки при загрузке
 document.addEventListener('DOMContentLoaded', updatePeriodButton);
 
-// Очистка всех дат
+// Очистка всех дат в фильтре
 document.querySelector('.clear-dates-btn').addEventListener('click', function() {
     document.getElementById('date_from').value = '';
     document.getElementById('date_to').value = '';
     updatePeriodButton();
     document.getElementById('filters').dispatchEvent(new Event('submit'));
 });
+
+

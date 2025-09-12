@@ -1,14 +1,17 @@
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render
 from .models import City, GameResult,Team, Tournament, TournamentSeries
-from django.db.models import Count, Q
-from django.db.models import Prefetch
+from django.db.models import Count, Prefetch
+from django.core.paginator import Paginator
 
 from .utils import q_search
 
 
-# "Показать еще"(ограничить показываемую информацию)
-# "Закрепить "thead" Турнирной таблицы при скроле.
+
+# Диаграмма как в кс2. Семиугольник получится. Chart.js библиотека есть говорят, нужно с неё начать
+# Даны для рейтинга вместо города
+# в "Достижение" исрапавить кубки и медали. Там где должны быть кубкиЮ ставим кубки, там где медали, медали.
+# настроить расчет статистики только выбранного периода в teams
 # телефонное отоброжение настроить
 # Убрать Header и сделать "Вернуться на сайт"
 # Кеширование
@@ -97,10 +100,26 @@ def index(request):
     # ФИНАЛЬНАЯ СОРТИРОВКА турниров по дате (новые сверху)
     tournaments = tournaments.order_by('-date')
 
-    # ФОРМИРОВАНИЕ КОНТЕКСТА для шаблона
+    # ПАГИНАЦИЯ
+    page = request.GET.get('page', 1)
+    items_per_page = 100
+    
+    if active_tab == 'teams':
+        paginator = Paginator(teams, items_per_page) # Разбивает teams по 5 элементов на страницу
+        teams_page = paginator.get_page(page) # Получить первую страницу
+        tournaments_page = []  
+        current_page = teams_page
+    else:
+        paginator = Paginator(tournaments, items_per_page) # Разбивает games по 5 элементов на страницу
+        teams_page = []
+        tournaments_page = paginator.get_page(page) # Получить первую страницу
+        current_page = tournaments_page
+    
     context = {
-        'teams': teams,
-        'tournaments': tournaments,
+        'teams': teams_page,  # пагинированные команды
+        'tournaments': tournaments_page,  # пагинированные турниры
+        'page_obj': current_page,  # текущая страница пагинации
+        'paginator': paginator,  # пагинатор
         'all_series': TournamentSeries.objects.all(),  # Все серии для фильтра
         'all_cities': City.objects.all().order_by('name'),  # Все города для фильтра
         'selected_city': city,
