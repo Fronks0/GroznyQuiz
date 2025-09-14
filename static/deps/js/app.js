@@ -163,7 +163,11 @@ function cleanupPageParam() {
         showModalWithLoader(teamModal, 'Загрузка данных команды...');
         fetch(`/team/${teamId}/modal/`)
             .then(response => response.ok ? response.text() : Promise.reject(response.status))
-            .then(html => teamModal.querySelector('.modal-content').innerHTML = html)
+            .then(html => {
+                teamModal.querySelector('.modal-content').innerHTML = html;
+                // Инициализируем радар-чарт после загрузки контента
+                setTimeout(initRadarChart, 100);
+            })
             .catch(error => showError(teamModal, `Ошибка загрузки команды: ${error}`));
     }
 
@@ -470,3 +474,115 @@ document.querySelector('.clear-dates-btn').addEventListener('click', function() 
 });
 
 
+// =============================================
+// 14. ИНИЦИАЛИЗАЦИЯ РАДАР-ЧАРТА
+// =============================================
+
+function initRadarChart() {
+    const radarCanvas = document.getElementById('topicRadarChart');
+    if (!radarCanvas) return;
+
+    // === ДАННЫЕ ===
+    const labels = radarCanvas.dataset.labels.split(',');          // короткие подписи осей
+    const rawValues = radarCanvas.dataset.values.split(',').map(Number); // исходные значения (например 4.5)
+    const values = rawValues.map(v => Math.round(v));              // округляем для точек (например 5)
+    const fullNames = radarCanvas.dataset.fullnames.split(',');    // полные названия тем для тултипа
+
+    // === НАСТРОЙКИ МАСШТАБА ===
+    const minValue = 0;   // минимальное значение (центр)
+    const maxValue = 6;   // максимальное значение (6 линий = 0..6)
+
+    // === СОЗДАНИЕ ДИАГРАММЫ ===
+    new Chart(radarCanvas, {
+        type: 'radar',   // тип: радар
+        data: {
+            labels: labels,   // подписи осей
+            datasets: [{
+                label: 'Средний балл по темам',
+                data: values, // данные (округлённые)
+                borderColor: '#7c4dff',                 // цвет линии
+                backgroundColor: 'rgba(124, 77, 255, 0.25)', // заливка
+                pointBackgroundColor: '#7c4dff',        // цвет точек
+                pointBorderColor: '#fff',               // обводка точек
+                pointHoverBackgroundColor: '#fff',      // цвет точки при наведении
+                pointHoverBorderColor: '#7c4dff',       // обводка при наведении
+                pointRadius: 3.5,   // размер точки
+                pointHoverRadius: 5, // размер при наведении
+                fill: true,         // закрашивать область
+                borderWidth: 2.8    // толщина линии
+            }]
+        },
+        options: {
+            responsive: true,          // адаптивность
+            maintainAspectRatio: false, // не держать пропорции фиксированно
+            scales: {
+                r: { // настройки радиальной шкалы
+                    angleLines: { // линии от центра
+                        color: 'rgba(255, 255, 255, 0.2)',
+                        lineWidth: 2
+                    },
+                    grid: { // круговые линии сетки
+                        color: 'rgba(255, 255, 255, 0.15)',
+                        lineWidth: 1.5
+                    },
+                    pointLabels: { // подписи тем
+                        color: '#e6ddff',
+                        font: {
+                            size: 18,
+                            weight: 'bold',
+                            family: 'Arial, sans-serif'
+                        },
+                        padding: 12
+                    },
+                    ticks: { // подписи значений (0..6)
+                        stepSize: 1,     // шаг между линиями (6 кругов)
+                        display: false,  // скрыли цифры
+                        backdropColor: 'transparent'
+                    },
+                    min: minValue,       // минимум
+                    max: maxValue,       // максимум
+                    suggestedMax: maxValue + 1 // делаем запас → круг чуть шире
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // убрали легенду
+                },
+                tooltip: { // тултип (всплывающая подсказка)
+                    usePointStyle: true, // кружочек вместо квадрата
+                    callbacks: {
+                        title: function(tooltipItems) { // заголовок тултипа
+                            const index = tooltipItems[0].dataIndex;
+                            return fullNames[index]; // полное название темы
+                        },
+                        label: function(context) { // текст тултипа
+                            const index = context.dataIndex;
+                            // показываем исходное значение, не округлённое
+                            return `Средний балл: ${rawValues[index]}`;
+                        },
+                        labelPointStyle: function() { // стиль точки в тултипе
+                            return {
+                                pointStyle: 'circle',
+                                rotation: 0,
+                                borderColor: '#7c4dff',
+                                backgroundColor: '#7c4dff'
+                            };
+                        }
+                    },
+                    backgroundColor: 'rgba(31, 15, 58, 0.95)', // фон тултипа
+                    titleColor: '#fff', // цвет заголовка
+                    bodyColor: '#e6ddff', // цвет текста
+                    borderColor: '#7c4dff', // рамка тултипа
+                    borderWidth: 1,
+                    cornerRadius: 10,
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 13 },
+                    padding: 12,
+                    boxPadding: 6,
+                    boxWidth: 8,
+                    boxHeight: 8
+                }
+            }
+        }
+    });
+}

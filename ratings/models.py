@@ -123,25 +123,63 @@ class Team(models.Model):
         ).order_by('tournament__series__display_order') 
 
         
-
-    #Лучшай тема на основе очков
-    @property
-    def best_topic(self):
-        topic_stats = (
+    # Рассчет среднего балла по темам
+    def get_topic_statistics(self):
+        """
+        Возвращает полную статистику по темам:
+        - averages: средний балл по каждой теме {topic_id: average_score}
+        - counts: количество игр по каждой теме {topic_id: games_count}
+        - best_topic: информация о лучшей теме по среднему баллу
+        """
+        # 1. Получаем все результаты команды по темам
+        topic_results = (
             TopicResult.objects
             .filter(game_result__team=self)
-            .values('topic__short_name', 'topic__full_name')
-            .annotate(total_points=Sum('points'))
-            .order_by('-total_points')
+            .select_related('topic')
+            .values('topic_id', 'topic__short_name', 'topic__full_name', 'points')
         )
         
-        if topic_stats:
-            best_topic_info = topic_stats[0]
-            return {
-                'short_name': best_topic_info['topic__short_name'],
-                'full_name': best_topic_info['topic__full_name'],
+        # 2. Группируем данные по темам
+        topic_stats = {}
+        for result in topic_results:
+            topic_id = result['topic_id']
+            if topic_id not in topic_stats:
+                topic_stats[topic_id] = {
+                    'points_sum': 0,
+                    'games_count': 0,
+                    'short_name': result['topic__short_name'],
+                    'full_name': result['topic__full_name']
+                }
+            # Накопление суммы баллов
+            topic_stats[topic_id]['points_sum'] += float(result['points'])
+            # Увеличение счетчика игр 
+            topic_stats[topic_id]['games_count'] += 1
+        
+        # 3. Рассчитываем средние баллы
+        averages = {}
+        counts = {}
+        for topic_id, stats in topic_stats.items():
+            averages[topic_id] = stats['points_sum'] / stats['games_count']
+            counts[topic_id] = stats['games_count']
+        
+        # 4. Находим лучшую тему
+        best_topic_info = None
+        if averages:
+            best_topic_id = max(averages, key=averages.get)
+            best_topic_info = {
+                'id': best_topic_id,
+                'short_name': topic_stats[best_topic_id]['short_name'],
+                'full_name': topic_stats[best_topic_id]['full_name'],
+                'average_score': averages[best_topic_id],
+                'games_count': counts[best_topic_id]
             }
-        return {'short_name': '-', 'full_name': 'Нет данных'}
+        
+        # 5. Возвращаем структурированные данные
+        return {
+            'averages': averages,
+            'counts': counts,
+            'best_topic': best_topic_info or {}
+        }
 
 
     def __str__(self):

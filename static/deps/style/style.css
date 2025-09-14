@@ -629,8 +629,8 @@ body.menu-open .main-content {
     }
 }
 
-/* Стили для модального окна команды и игры */
-.team-modal {
+/* ОБЩИЕ СТИЛИ ДЛЯ МОДАЛЬНЫХ ОКОН*/
+.team-modal, .game-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -640,10 +640,10 @@ body.menu-open .main-content {
     display: none;
 }
 
-.team-modal.active {
+.team-modal.active, .game-modal.active {
     display: block;
 }
-
+/* Затемнение фона */
 .modal-overlay {
     position: absolute;
     top: 0;
@@ -662,189 +662,287 @@ body.menu-open .main-content {
     width: 90%;
     max-width: 800px;
     max-height: 90vh;
-    background: #1f0f3a;
-    border-radius: 12px;
-    padding: 25px;
+    background: linear-gradient(145deg, #1f0f3a, #241047);
+    border-radius: 16px;
+    padding: 30px;
     overflow-y: auto;
-    border: 1px solid #3d2a5e;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(124, 77, 255, 0.25);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
     color: white;
+    animation: modalAppear 0.3s ease-out;
 }
 
+.modal-content.game {
+    max-width: 1000px;
+    border: 1px solid #3d2a5e;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Кнопка закрытия */
 .close-modal {
     position: absolute;
     top: 15px;
-    right: 15px;
+    right: 20px;
     background: none;
     border: none;
-    color: white;
-    font-size: 2.5rem;
+    color: #b39ddb;
+    font-size: 2.2rem;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: color 0.2s;
+    z-index: 10;
 }
 
 .close-modal:hover {
-    color: #7c4dff;
+    color: #e0a0ff;
+}
+/* Заголовки модалок */
+/* Заголовок Игр */
+.game-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(124,77,255,0.3);
+    margin-bottom: 8px;
 }
 
-.team-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 25px;
-    gap: 20px;
-    padding-left: 10px;
-}
 
-.team-name {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-    color: white;
-}
-
-.team-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px; 
-    margin-top: -5px;
-}
-
-.team-meta span {
+.game-meta span {
+    font-size: 0.95rem;
+    color: #c5b6e6;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-.team-meta .city {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #d1c4e9; 
+.team-header {
+    margin-bottom: 25px;
 }
 
-.team-meta .last-game {
-    font-size: 0.9rem;
-    color: #b39ddb; 
-}
-
-/* СТатистика под именем */
-.stats{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
+.game-header {
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 5px solid #3d2a5e;
-    border-radius: 5px;
+    border-bottom: 2px solid rgba(124, 77, 255, 0.2);
 }
 
-.stat-card{
+/* Метаданные игры в одну строку */
+.game-meta {
     display: flex;
-    flex: 1;
-    background: #2a1745;
-    border-radius: 8px;
-    padding: 15px;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Заголовок Команды */
+.team-header {
+    margin-bottom: 25px;
     text-align: center;
-    border: 1px solid #3d2a5e;
+}
+
+.team-name {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.team-meta {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.team-meta span {
+    font-size: 1.05rem;
+    color: #d1c4e9;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.team-meta i {
+    color: #7c4dff;
+    width: 16px;
+}
+
+/* ====== СТИЛИ ДЛЯ МОДАЛКИ КОМАНДЫ ====== */
+
+/* Контейнер статистики с диаграммой */
+.stats-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin: 25px 0;
+    padding-bottom: 25px;
+    border-bottom: 2px solid rgba(124, 77, 255, 0.2);
+}
+
+/* Сетка карточек 2x3 */
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.stat-card {
+    padding: 20px 15px;
+    background: rgba(42, 23, 69, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(124, 77, 255, 0.2);
+    text-align: center;
+    display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 120px;
+    position: relative;
+    overflow: hidden;
 }
 
 .stat-value {
     font-size: 1.8rem;
-    font-weight: bold;
-    color: white;
+    font-weight: 700;
+    color: #fff;
     margin-bottom: 5px;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(124, 77, 255, 0.3);
+}
+
+.best-topic .stat-value {
+    font-size: 1.4rem;
 }
 
 .stat-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #b39ddb;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    background: rgba(124, 77, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(124, 77, 255, 0.2);
 }
+
+/* Диаграмма */
+.stats-radar {
+    background: rgba(42, 23, 69, 0.6);
+    border: 1px solid rgba(124, 77, 255, 0.25);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stats-radar h3 {
+    font-size: 1.1rem;
+    color: #e0d7f5;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.chart-container {
+    flex: 1;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Секция достижений */
 .achievements-section {
-    padding-bottom: 30px;
-    border-bottom: 5px solid #3d2a5e;
-    border-radius: 5px;
+    padding: 20px 0;
+    border-bottom: 2px solid rgba(124, 77, 255, 0.2);
 }
 
 .achievements-section h3 {
-    justify-content: center;
     font-size: 1.3rem;
-    margin-bottom: 10px;
-    color: white;
+    color: #fff;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 10px;
+    justify-content: center;
 }
 
-/* Основные турниры  */
 .tournament-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #3d2a5e;
-}
-
-.tournament-row:last-child {
-    border-bottom: none;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: rgba(42, 23, 69, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(124, 77, 255, 0.15);
 }
 
 .tournament-name {
-    font-weight: bold;
-    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #e0d7f5;
     flex: 1;
-    font-size: 0.85rem;
 }
 
 .tournament-stats {
     display: flex;
-    gap: 15px;
+    gap: 12px;
 }
 
 .tournament-stats span {
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
     gap: 5px;
-    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
 }
 
-.gold {
+/* Цвета для медалей в достижениях */
+.achievements-section .gold {
     color: #FFD700;
+    background: rgba(255, 215, 0, 0.1);
 }
-
-.silver {
+.achievements-section .silver {
     color: #C0C0C0;
+    background: rgba(192, 192, 192, 0.1);
 }
-
-.bronze {
+.achievements-section .bronze {
     color: #CD7F32;
-}
-
-.game{
-    color: #b39ddb;
-}
-
-.tournament-info{
-
-    color: white;
-    flex: 1;
-    font-size: 1rem;
+    background: rgba(205, 127, 50, 0.1);
 }
 
 
-/* История игр */
+
+/* История последних игр */
 .history-table {
     margin-top: 25px;
+    padding-top: 20px;
 }
 
 .history-table h3 {
     font-size: 1.3rem;
-    margin-bottom: 15px;
-    color: white;
+    color: #fff;
+    margin-bottom: 18px;
     display: flex;
     align-items: center;
     gap: 10px;
+    justify-content: center;
 }
 
 .history-table table {
@@ -852,97 +950,24 @@ body.menu-open .main-content {
     border-collapse: collapse;
 }
 
-.history-table th,
-.history-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #3d2a5e;
-}
-
 .history-table th {
-    background: #2a1745;
-    color: #d1c4e9;
+    background: rgba(124, 77, 255, 0.15);
+    color: #e0d7f5;
     font-weight: 600;
-    font-size: 0.9rem;
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 0.95rem;
 }
 
 .history-table td {
-    color: white;
-    font-size: 0.9rem;
+    color: #fff;
+    font-size: 0.95rem;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(124, 77, 255, 0.2);
 }
 
-/* Адаптивность */
-@media (max-width: 768px) {
-    .modal-content {
-        width: 95%;
-        padding: 15px;
-    }
-    
-    .team-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .tournament-stats{
-        padding: 0 10px;
-    }
+/* ====== СТИЛИ ДЛЯ МОДАЛКИ ИГРЫ ====== */
 
-    .history-table th,
-    .history-table td {
-        padding: 8px 10px;
-        font-size: 0.8rem;
-    }
-}
-
-
-
-/* ИГРЫ */
-/* Стили для модального окна игры */
-.game-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
-    display: none;
-}
-
-.game-modal.active {
-    display: block;
-}
-
-.modal-content.game{
-    max-width: 1000px;
-}
-
-.game-header {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #3d2a5e;
-}
-
-.game-title {
-    font-size: 1.8rem;
-    color: white;
-    margin-bottom: 10px;
-}
-
-.game-meta {
-    display: flex;
-    gap: 20px;
-    color: #b39ddb;
-    flex-wrap: wrap;
-}
-
-.game-meta span {
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-/* Детальная таблица результатов */
 .detailed-results {
     margin: 25px 0;
     overflow-x: auto;
@@ -977,7 +1002,6 @@ body.menu-open .main-content {
     text-align: center;
     color: #d1c4e9;
     border: 1px solid #4a376b;
-    white-space: nowrap;
 }
 
 .excel-style-table th.result {
@@ -1001,7 +1025,6 @@ body.menu-open .main-content {
     background: rgba(124, 77, 255, 0.1);
 }
 
-/* Информация об игре */
 .game-info {
     background: #2a1745;
     padding: 20px;
@@ -1018,22 +1041,38 @@ body.menu-open .main-content {
     font-size: 1.2rem;
 }
 
-.game-info p{
+.game-info p {
     font-size: 0.8rem;
 }
 
-
-
-/* Убрать возможно придется */
-.topics-section ul {
-    padding-left: 20px;
-    font-size: 0.8rem;
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+    .team-name, .game-title {
+        font-size: 1.6rem;
+    }
+    
+    .history-table th,
+    .history-table td {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .excel-style-table {
+        font-size: 0.8rem;
+    }
+    
+    .game-meta {
+        gap: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
-.topics-section li {
-    color: white;
-    margin-bottom: 5px;
-}
+
 
 /* Адаптивность для таблицы */
 @media (max-width: 1024px) {
@@ -1092,11 +1131,6 @@ body.menu-open .main-content {
     color: #ff6b6b;
     font-size: 1.2rem;
 }
-
-/* Стили для "История последних игр" */
-.gold { color: #FFD700; font-weight: bold; }
-.silver { color: #C0C0C0; font-weight: bold; }  
-.bronze { color: #CD7F32; font-weight: bold; }
 
 
 

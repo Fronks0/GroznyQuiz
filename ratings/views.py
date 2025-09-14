@@ -1,17 +1,24 @@
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render
-from .models import City, GameResult,Team, Tournament, TournamentSeries
+from .models import City, GameResult,Team, Topic, Tournament, TournamentSeries
 from django.db.models import Count, Prefetch
 from django.core.paginator import Paginator
 
 from .utils import q_search
 
 
-
-# Диаграмма как в кс2. Семиугольник получится. Chart.js библиотека есть говорят, нужно с неё начать
-# Даны для рейтинга вместо города
-# в "Достижение" исрапавить кубки и медали. Там где должны быть кубкиЮ ставим кубки, там где медали, медали.
-# настроить расчет статистики только выбранного периода в teams
+# Внешний вид диаграммы настроить. устаногвить максимальное значение среднего балла и настроить центральные линии и рассширить
+# Настроить статистику в зависимости от выбранного турнира
+# Добавить фильтр труниров
+# Выбранный фильтр в основной таблице, должен влиять на выбранный фильтр в модалке.
+# настроить расчет статистики в модалке только выбранного периода в teams
+# убрать фильтр все города
+# внешний вид фильтров настроить
+# Даны или пояса как сила для рейтинга вместо города
+# в "Достижение" исрапавить кубки и медали. Там где должны быть кубки ставим кубки, там где медали, медали.
+# Попровить Переход мжду вкладками, а именно Надпись "Загрузка" которая появляется.
+# добавить шрифты которые Ислам просил
+# Привести все в зависимости от данных и видов блоков к единым цветам, чтоб все не было разноцветным.
 # телефонное отоброжение настроить
 # Убрать Header и сделать "Вернуться на сайт"
 # Кеширование
@@ -137,23 +144,39 @@ def index(request):
 
 
 def team_modal(request, team_id):
-    # Получаем конкретную команду
+    # Получаем команду
     team = Team.objects.with_stats().select_related('city').get(id=team_id)
-    #Получаем результаты последних 5 игр
+    
+    # Получаем результаты последних 5 игр
     recent_games = team.gameresult_set.select_related(
         'tournament', 'tournament__city'
     ).order_by('-tournament__date')[:5]
     
-    # Получаем Статистику в "Достижения" из метода который в Team 
+    # Получаем статистику по сериям турниров для Достижений
     series_stats = team.get_series_stats()
+    
+    # Радар
+    # Получаем статистику
+    topic_stats = team.get_topic_statistics()
 
+    # Формируем данные для радара
+    radar_data = {'labels': [],'data': [], 'full_names': []}
+
+    # Преобразуем averages в arrays для Chart.js
+    for topic in Topic.objects.all().order_by('full_name'):  # сортируем по алфавиту
+        if topic.id in topic_stats['averages']:
+            radar_data['labels'].append(topic.short_name)
+            radar_data['data'].append(topic_stats['averages'][topic.id])
+            radar_data['full_names'].append(topic.full_name)
     
     context = {
         'team': team,
-        'best_topic': team.best_topic,
+        'best_topic': topic_stats['best_topic'],  # Лучшая тема
+        'radar_data': radar_data,    # Данные для диаграммы
         'series_stats': series_stats,
         'recent_games': recent_games
     }
+    
     return render(request, 'ratings/includes/modals/team_modal.html', context)
 
 
