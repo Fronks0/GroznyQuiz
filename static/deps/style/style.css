@@ -388,20 +388,18 @@ body.menu-open .main-content {
     outline: none;
 }
 
-
-
-/* Контейнер для кнопки */
-.apply-button-box {
+/* Контейнер для кнопок */
+.filter-buttons-container {
     flex: 0 0 auto;
-    min-width: 120px;
+    min-width: 220px;
     display: flex;
+    gap: 10px;
     align-items: flex-end;
 }
 
 /* Стили для кнопки Применить */
 .apply-button {
-    width: 100%;
-    padding: 12px 15px;
+    padding: 10px 16px;
     background: #7c4dff;
     color: white;
     border: none;
@@ -411,15 +409,68 @@ body.menu-open .main-content {
     transition: all 0.3s;
     font-size: 0.95rem;
     white-space: nowrap;
+    min-width: 100px;
+    height: 44px;
 }
 
 .apply-button:hover {
     background: #6a3ddf;
+    transform: translateY(-1px);
 }
 
-.apply-button:active{
+.apply-button:active {
     background: #5e35b1;
+    transform: translateY(0);
 }
+
+/* Стили для кнопки Сбросить */
+.reset-button {
+    padding: 10px 16px;
+    background: #5a3f8b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    min-width: 100px;
+    height: 44px;
+}
+
+.reset-button:hover {
+    background: #4a336e;
+    transform: translateY(-1px);
+}
+
+.reset-button:active {
+    background: #3d2a5e;
+    transform: translateY(0);
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .filter-buttons-container {
+        min-width: 100%;
+        flex-direction: row; /* Оставляем в строке на мобильных */
+        justify-content: space-between;
+    }
+    
+    .apply-button, .reset-button {
+        flex: 1;
+        min-width: auto;
+    }
+    
+    .apply-button {
+        padding: 12px 15px;
+    }
+    
+    .reset-button {
+        padding: 10px 12px;
+    }
+}
+
 
 
 /* по умолчанию скрываем 2 фильтра*/
@@ -512,31 +563,6 @@ body.menu-open .main-content {
     outline: none;
 }
 
-/* Сброс */
-.clear-dates-btn {
-    width: 100%;
-    padding: 10px;
-    background: #7c4dff;
-    border: none;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-    font-size: 0.9rem;
-    margin-top: 10px;
-    transition: all 0.3s ease;
-}
-
-.clear-dates-btn:hover {
-    background: #6a3ddf;
-
-}
-.clear-dates-btn i {
-    margin-right: 5px;
-}
-
-.clear-dates-btn:active{
-    background: #5e35b1;
-}
 
 
 
@@ -752,8 +778,11 @@ body.menu-open .main-content {
     font-size: 2.2rem;
     font-weight: 700;
     color: #fff;
-    margin-bottom: 12px;
-    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+    text-align: center;
+    text-shadow: 0 0 15px rgba(124, 77, 255, 0.3);
+    padding: 0 20px;
 }
 
 .team-meta {
@@ -776,6 +805,38 @@ body.menu-open .main-content {
     width: 16px;
 }
 
+/* Разделитель секций в модалках */
+.modal-section-divider {
+    position: relative;
+    text-align: center;
+    margin: 40px 0px 25px 0px;
+    padding: 0 20px;
+}
+
+.modal-section-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(124, 77, 255, 0.4) 20%, rgba(124, 77, 255, 0.4) 80%, transparent 100%);
+    z-index: 1;
+}
+
+.modal-section-divider span {
+    position: relative;
+    display: inline-block;
+    padding: 0 20px;
+    background: linear-gradient(145deg, #1f0f3a, #241047);
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 2;
+}
+
 /* ====== СТИЛИ ДЛЯ МОДАЛКИ КОМАНДЫ ====== */
 
 /* Контейнер статистики с диаграммой */
@@ -783,9 +844,7 @@ body.menu-open .main-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 25px;
-    margin: 25px 0;
-    padding-bottom: 25px;
-    border-bottom: 2px solid rgba(124, 77, 255, 0.2);
+
 }
 
 /* Сетка карточек 2x3 */
@@ -865,21 +924,6 @@ body.menu-open .main-content {
 }
 
 /* Секция достижений */
-.achievements-section {
-    padding: 20px 0;
-    border-bottom: 2px solid rgba(124, 77, 255, 0.2);
-}
-
-.achievements-section h3 {
-    font-size: 1.3rem;
-    color: #fff;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-}
-
 .tournament-row {
     display: flex;
     justify-content: space-between;
@@ -930,20 +974,7 @@ body.menu-open .main-content {
 
 
 /* История последних игр */
-.history-table {
-    margin-top: 25px;
-    padding-top: 20px;
-}
 
-.history-table h3 {
-    font-size: 1.3rem;
-    color: #fff;
-    margin-bottom: 18px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-}
 
 .history-table table {
     width: 100%;
@@ -1272,4 +1303,38 @@ body.menu-open .main-content {
         height: 28px;
         font-size: 0.8rem;
     }
+}
+
+/* Компактный блок фильтров */
+.compact-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding: 12px 16px;
+    background: rgba(42, 23, 69, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(124, 77, 255, 0.2);
+    font-size: 0.9rem;
+}
+
+.filters-label {
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.filters-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-item {
+    color: #d1c4e9;
+    padding: 6px 12px;
+    background: rgba(124, 77, 255, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(124, 77, 255, 0.15);
+    font-size: 0.85rem;
 }

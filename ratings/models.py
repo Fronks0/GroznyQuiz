@@ -124,22 +124,32 @@ class Team(models.Model):
 
         
     # Рассчет среднего балла по темам
-    def get_topic_statistics(self):
+    def get_topic_statistics(self, results_qs=None):
         """
         Возвращает полную статистику по темам:
         - averages: средний балл по каждой теме {topic_id: average_score}
         - counts: количество игр по каждой теме {topic_id: games_count}
         - best_topic: информация о лучшей теме по среднему баллу
         """
-        # 1. Получаем все результаты команды по темам
-        topic_results = (
-            TopicResult.objects
-            .filter(game_result__team=self)
-            .select_related('topic')
-            .values('topic_id', 'topic__short_name', 'topic__full_name', 'points')
-        )
+        # 1. Получаем все результаты команды по темам (ВСЕ или ОТФИЛЬТРОВАННЫЕ)
+        if results_qs is None:
+            # Если не передан QuerySet, берем все игры команды
+            topic_results = (
+                TopicResult.objects
+                .filter(game_result__team=self)
+                .select_related('topic')
+                .values('topic_id', 'topic__short_name', 'topic__full_name', 'points')
+            )
+        else:
+            # ★ ЕСЛИ ПЕРЕДАН QuerySet - ФИЛЬТРУЕМ ПО НЕМУ ★
+            topic_results = (
+                TopicResult.objects
+                .filter(game_result__in=results_qs)  # Фильтруем по переданным играм
+                .select_related('topic')
+                .values('topic_id', 'topic__short_name', 'topic__full_name', 'points')
+            )
         
-        # 2. Группируем данные по темам
+        # 2. Группируем данные по темам (остальное без изменений)
         topic_stats = {}
         for result in topic_results:
             topic_id = result['topic_id']
@@ -180,6 +190,7 @@ class Team(models.Model):
             'counts': counts,
             'best_topic': best_topic_info or {}
         }
+
 
 
     def __str__(self):

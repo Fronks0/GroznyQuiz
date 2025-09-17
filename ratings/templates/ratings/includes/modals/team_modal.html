@@ -6,13 +6,36 @@
         <h2 class="team-name">{{team.name}}</h2>
         <div class="team-meta">
             <span class="city"><i class="fas fa-map-marker-alt"></i>{{ team.city.name }}</span>
-            <span class="last-game"><i class="fas fa-calendar-alt"></i>Последняя игра: {{ team.last_game_date|date:"d.m.Y"|default:"-" }}</span>
+            <span class="last-game"><i class="fas fa-calendar-alt"></i>Последняя игра: {{ team.last_game_date|date:"d.m.y"|default:"-" }}</span>
         </div>
     </div>
 </div>
 
+<!-- Разделитель между командой и статистикой -->
+<div class="modal-section-divider">
+    <span>Статистика</span>
+</div>
+
+{% if active_filters.game_series or active_filters.date_from or active_filters.date_to %}
+<div class="compact-filters">
+    <span class="filters-label">Фильтры:</span>
+    <div class="filters-list">
+        {% if active_filters.game_series %}
+            <span class="filter-item">Турнир: {{ active_filters.game_series }}</span>
+        {% endif %}
+        {% if active_filters.date_from %}
+            <span class="filter-item">С: {{ active_filters.date_from|slice:"8:10" }}.{{ active_filters.date_from|slice:"5:7" }}.{{ active_filters.date_from|slice:"2:4" }} г.</span>
+        {% endif %}
+        {% if active_filters.date_to %}
+            <span class="filter-item">ПО: {{ active_filters.date_to|slice:"8:10" }}.{{ active_filters.date_to|slice:"5:7" }}.{{ active_filters.date_to|slice:"2:4" }} г.</span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
 <!-- Единая секция статистики с диаграммой -->
 <div class="stats-container">
+    <!-- Карточки со статистикой -->
     <div class="stats-cards">
         <div class="stat-card">
                 <div class="stat-value">{{ team.games_played_count|default:0 }}</div>
@@ -39,7 +62,8 @@
                 <div class="stat-label">Лучшая тема</div>
         </div>
     </div>
-    <!-- Радар -->
+    
+    <!-- Радар-диаграмма статистики по темам -->
     <div class="stats-radar">
         <h3><i class="fas fa-chart-radar"></i>Статистика по темам</h3>
         <div class="chart-container">
@@ -52,10 +76,13 @@
     </div>
 </div>
 
-<!-- Достижения -->
+<!-- Разделитель перед достижениями -->
+<div class="modal-section-divider">
+    <span>Достижения</span>
+</div>
+
+<!-- Секция достижений команды -->
 <div class="achievements-section">
-    <h3><i class="fas fa-trophy"></i> Достижения</h3>
-    
     {% for stat in series_stats %}  
     <div class="tournament-row">
         <div class="tournament-name">{{ stat.tournament__series__name }}</div>  
@@ -73,6 +100,7 @@
         </div>
     </div>
     {% empty %}
+    <!-- Сообщение при отсутствии достижений -->
     <div class="tournament-info" style="text-align: center; color: #b39ddb; padding: 20px;">
         <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
         Пока нет достижений
@@ -80,9 +108,13 @@
     {% endfor %}
 </div>
 
-<!-- История игр -->
+<!-- Разделитель перед историей игр -->
+<div class="modal-section-divider">
+    <span>История последних игр</span>
+</div>
+
+<!-- Таблица истории последних игр -->
 <div class="history-table">
-    <h3><i class="fas fa-history"></i> История последних игр</h3>
     <table>
         <thead>
             <tr>
@@ -107,6 +139,7 @@
                 <td>{{ result.total_points|floatformat:"-1" }}</td>
             </tr>
             {% empty %}
+            <!-- Сообщение при отсутствии данных об играх -->
             <tr>
                 <td colspan="4" style="text-align: center; color: #b39ddb; padding: 20px;">
                     <i class="fas fa-inbox" style="font-size: 1.5rem; margin-bottom: 10px; display: block;"></i>
