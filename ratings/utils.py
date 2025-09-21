@@ -69,7 +69,7 @@ def filter_team_and_tournament(params, teams, tournaments=None, active_tab='team
         tournaments = Tournament.objects.all()
 
     search_query = params.get('search', '')
-    city = params.get('city')
+    city = params.get('city', 'Грозный')
     game_series = params.get('game_series')
     date_from = params.get('date_from')
     date_to = params.get('date_to')
@@ -105,9 +105,8 @@ def filter_team_and_tournament(params, teams, tournaments=None, active_tab='team
         teams = teams.distinct()
 
     # === ФИЛЬТР ГОРОДА ===
-    if city:
-        teams = teams.filter(city__name=city)
-        tournaments = tournaments.filter(city__name=city)
+    teams = teams.filter(city__name=city)
+    tournaments = tournaments.filter(city__name=city)
 
     # === ФИЛЬТР ПО СЕРИИ ТУРНИРОВ ===
     if game_series:

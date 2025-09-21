@@ -557,18 +557,15 @@ function initRadarChart() {
     if (!radarCanvas) return;
 
     // === ДАННЫЕ ДЛЯ ДИАГРАММЫ ===
-    
-    // Получаем короткие названия тем из data-атрибута и разбиваем по запятым
     const labels = radarCanvas.dataset.labels.split(',');          
-    
-    // Получаем числовые значения баллов из data-атрибута и преобразуем в числа
     const rawValues = radarCanvas.dataset.values.split(',').map(Number); 
-    
-    // Используем исходные значения (без округления) для отображения на диаграмме
-    const values = rawValues; 
-    
-    // Получаем полные названия тем для всплывающих подсказок
     const fullNames = radarCanvas.dataset.fullnames.split(',');    
+
+    // === ОКРУГЛЕНИЕ ДЛЯ ОТОБРАЖЕНИЯ (до 0.5) ===
+    const displayValues = rawValues.map(value => {
+        // Округляем до ближайшего 0.5
+        return Math.round(value * 2) / 2;
+    });   
 
     // === НАСТРОЙКИ МАСШТАБА ДИАГРАММЫ ===
     const minValue = 0;   // Минимальное значение на шкале (центр диаграммы)
@@ -581,7 +578,7 @@ function initRadarChart() {
             labels: labels,   // Подписи для осей (короткие названия тем)
             datasets: [{
                 label: 'Средний балл по темам', // Название набора данных
-                data: values, // ★ ВОТ ЗДЕСЬ ПЕРЕДАЮТСЯ ДАННЫЕ ★ - числовые значения для отображения
+                data: displayValues, // ★ ВОТ ЗДЕСЬ ПЕРЕДАЮТСЯ ДАННЫЕ ★ - числовые значения для отображения
                 borderColor: '#7c4dff',                 // Цвет линии диаграммы
                 backgroundColor: 'rgba(124, 77, 255, 0.25)', // Цвет заливки области
                 pointBackgroundColor: '#7c4dff',        // Цвет точек данных
@@ -610,7 +607,7 @@ function initRadarChart() {
                     pointLabels: { // Подписи тем на концах осей
                         color: '#e6ddff', // Цвет текста подписей
                         font: {
-                            size: 14, // Размер шрифта подписей
+                            size: 16, // Размер шрифта подписей
                             weight: 'bold', // Жирность шрифта
                             family: 'Arial, sans-serif' // Шрифт
                         },

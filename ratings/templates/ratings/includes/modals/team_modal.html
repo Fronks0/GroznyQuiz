@@ -82,19 +82,32 @@
 </div>
 
 <!-- Секция достижений команды -->
+
 <div class="achievements-section">
     {% for stat in series_stats %}  
     <div class="tournament-row">
         <div class="tournament-name">{{ stat.tournament__series__name }}</div>  
         <div class="tournament-stats">
-            <span class="game">Участий: {{ stat.participations }}</span>  
+            <span class="game">Участий: {{ stat.participations }}</span>        
+            
+            <!-- Победы (1 место) -->
             {% if stat.wins > 0 %}
-            <span class="gold"><i class="fas fa-trophy"></i> {{ stat.wins }}</span>  
+                {% if stat.tournament__series__tournament_type == 'cup' %}
+                <!-- Кубок ТОЛЬКО для кубковых турниров -->
+                <span class="cup"><i class="fas fa-trophy"></i> {{ stat.wins }}</span>
+                {% else %}
+                <!-- Золотая медаль для обычных турниров -->
+                <span class="gold"><i class="fas fa-medal"></i> {{ stat.wins }}</span>
+                {% endif %}
             {% endif %}
-            {% if stat.second_places > 0 %}
+            
+            <!-- 2 место (ТОЛЬКО для обычных турниров) -->
+            {% if stat.second_places > 0 and stat.tournament__series__tournament_type == 'regular' %}
             <span class="silver"><i class="fas fa-medal"></i> {{ stat.second_places }}</span>  
             {% endif %}
-            {% if stat.third_places > 0 %}
+            
+            <!-- 3 место (ТОЛЬКО для обычных турниров) -->
+            {% if stat.third_places > 0 and stat.tournament__series__tournament_type == 'regular' %}
             <span class="bronze"><i class="fas fa-medal"></i> {{ stat.third_places }}</span>  
             {% endif %}
         </div>
@@ -112,7 +125,6 @@
 <div class="modal-section-divider">
     <span>История последних игр</span>
 </div>
-
 <!-- Таблица истории последних игр -->
 <div class="history-table">
     <table>

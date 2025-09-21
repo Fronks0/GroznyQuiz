@@ -34,10 +34,22 @@ class City(models.Model):
     def __str__(self):
         return self.name
 
+
 #Серия турнира
 class TournamentSeries(models.Model):
+    TOURNAMENT_TYPES = [
+        ('cup', 'Кубковый турнир'),
+        ('regular', 'Обычный турнир'),
+    ]
+    
     name = models.CharField(max_length=100, verbose_name="Название серии", unique=True)
     display_order = models.PositiveIntegerField(default=100, verbose_name="Порядок отображения")
+    tournament_type = models.CharField(
+        max_length=10, 
+        choices=TOURNAMENT_TYPES, 
+        default='regular', 
+        verbose_name="Тип турнира"
+    )
     
     class Meta:
         verbose_name = "Серия турниров"
@@ -105,6 +117,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название команды", unique=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, verbose_name="Город команды")
     objects = TeamQuerySet.as_manager()
+    
 
     class Meta:
         verbose_name = "Команда"
@@ -114,7 +127,8 @@ class Team(models.Model):
     def get_series_stats(self):
         return self.gameresult_set.values(
             'tournament__series__name',
-            'tournament__series__display_order'
+            'tournament__series__display_order',
+            'tournament__series__tournament_type',
         ).annotate(
             participations=Count('id'),
             wins=Count('id', filter=Q(place=1)),
@@ -211,6 +225,7 @@ class GameResult(models.Model):
     class Meta:
         verbose_name = "Результат игры"
         verbose_name_plural = "Результаты игры"
+        unique_together = ['tournament', 'team']
 
     #Функции для game_modal
     def points_before_black_box(self):

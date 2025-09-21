@@ -1,4 +1,119 @@
-/* Сброс */
+/* Подключение шрифтов Actay */
+@font-face {
+    font-family: 'Actay Wide';
+    src: url('/static/deps/fonts/ActayWide-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Actay';
+    src: url('/static/deps/fonts/Actay-Regular.otf') format('opentype');
+    font-weight: 500; /* Полужирный для лучшей читаемости */
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Actay';
+    src: url('/static/deps/fonts/ActayCondensed-Thin.otf') format('opentype');
+    font-weight: 400; /* Обычный, но чуть заметнее */
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Actay Wide для заголовков и акцентов */
+.team-name,
+.game-name,
+.modal-section-divider span,
+.stat-value,
+.main-tab,
+.data-table th,
+.filter-box label,
+.game-meta span,
+.team-meta span {
+    font-family: 'Actay Wide', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Actay SemiBold для кнопок и интерфейса */
+.search-button,
+.apply-button,
+.reset-button,
+.stat-label,
+.tournament-name,
+.nav-course,
+.nav-link {
+    font-family: 'Actay', Arial, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* Actay Regular для основного текста - чуть жирнее */
+.data-table td,
+.filter-box select,
+.search-field input,
+.period-toggle,
+.tournament-stats span,
+.history-table td,
+.game-info p,
+.detailed-results td,
+.excel-style-table td {
+    font-family: 'Actay', Arial, sans-serif;
+    font-weight: 500; /* Чуть жирнее обычного */
+    letter-spacing: 0.2px;
+}
+
+/* Делаем информацию об игре и данные в таблице более заметными */
+.game-info p {
+    font-weight: 500; /* Полужирный для информации об игре */
+    color: #e6ddff;
+    margin-bottom: 8px;
+}
+
+.detailed-results td,
+.excel-style-table td {
+    font-weight: 500; /* Полужирный для данных в таблице */
+    color: #ffffff;
+}
+
+/* Особо выделяем важные числа и результаты */
+.stat-value {
+    font-size: 2rem;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(124, 77, 255, 0.3);
+}
+
+/* Улучшаем читаемость таблиц */
+.data-table th {
+    background: linear-gradient(135deg, #3d2a5e, #2a1745);
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 0.95rem;
+}
+
+.data-table td {
+    color: #f0f0f0;
+    border-bottom: 1px solid rgba(124, 77, 255, 0.2);
+}
+
+/* Кнопки становятся более выразительными */
+.search-button,
+.apply-button {
+    background: linear-gradient(135deg, #7c4dff, #6a3ddf);
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.reset-button {
+    background: linear-gradient(135deg, #5a3f8b, #4a336e);
+    font-weight: 600;
+}
+
+/* Сброс*/
 * {
     margin: 0;
     padding: 0;
@@ -8,11 +123,13 @@
     transition: all 0.3s;
 }
 
+/* Базовые настройки шрифтов */
 body {
     font-size: 62.5%;
-    font-family: Arial, sans-serif;
+    font-family: 'Actay', Arial, sans-serif;
+    font-weight: normal;
     color: white;
-    padding-top: 6rem
+    padding-top: 6rem;
 }
 
 /* Фон и затемнение */
@@ -84,6 +201,7 @@ header .nav-header .nav-btn .close-menu {
 
 /* Ссылки навигации */
 header .navbar .nav-link {
+    font-family: 'Actay Wide', Arial, sans-serif;
     color: white;
     font-size: 1.4rem;
     font-weight: 500;
@@ -130,12 +248,13 @@ header .nav-header .nav-btn.active .close-menu {
 
 /* Кнопка "Записаться на курс" */
 .nav-course {
+    font-family: Arial, sans-serif;
     display: inline-block;
     font-size: 1.2rem;
     background: white;
     color: black;
     border-radius: 25px;
-    padding: 0.8rem 1.5rem;
+    padding: 0.7rem 1.3rem;
     font-weight: bold;
     transition: all 0.3s ease;
     border: 2px solid transparent;
@@ -291,7 +410,7 @@ body.menu-open .main-content {
     background: #2a1745;
     border-radius: 8px;
     padding: 0 15px;
-    border: 1px solid #4a376b;
+    border: 1px solid rgba(124, 77, 255, 0.2);
 }
 
 .search-field i {
@@ -369,7 +488,7 @@ body.menu-open .main-content {
     width: 100%;
     padding: 12px 15px;              
     background: #2a1745;  
-    border: 1px solid #4a376b; 
+    border: 1px solid rgba(124, 77, 255, 0.2);
     color: white;
     border-radius: 8px;           
     font-size: 0.95rem;
@@ -387,6 +506,18 @@ body.menu-open .main-content {
     border-color: #7c4dff;
     outline: none;
 }
+
+
+
+/* Стилизация при наведении на option */
+.filter-box select option:hover,
+.filter-box select option:focus,
+.filter-box select option:checked {
+    background: #7c4dff !important;
+    color: white !important;
+}
+
+
 
 /* Контейнер для кнопок */
 .filter-buttons-container {
@@ -489,7 +620,7 @@ body.menu-open .main-content {
     width: 100%;
     padding: 12px 15px;
     background: #2a1745;
-    border: 1px solid #4a376b;
+    border: 1px solid rgba(124, 77, 255, 0.2);
     color: white;
     border-radius: 8px;
     cursor: pointer;
@@ -510,7 +641,7 @@ body.menu-open .main-content {
     left: 0;
     right: 0;
     background: #2a1745;
-    border: 1px solid #4a376b;
+    border: 1px solid rgba(124, 77, 255, 0.2);
     border-radius: 8px;
     padding: 15px;
     margin-top: 5px;
@@ -545,7 +676,7 @@ body.menu-open .main-content {
     flex: 1;
     padding: 10px 12px;
     background: #1f0f3a;
-    border: 1px solid #4a376b;
+    border: 1px solid rgba(124, 77, 255, 0.2);
     color: white;
     border-radius: 6px;
     font-size: 0.9rem;
@@ -573,7 +704,7 @@ body.menu-open .main-content {
     border-radius: 12px;
     overflow: visible;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    border: 1px solid #3d2a5e;
+    border: 1px solid rgba(124, 77, 255, 0.2);
 }
 
 .table-wrapper {
@@ -601,6 +732,13 @@ body.menu-open .main-content {
     font-size: 1rem;
 }
 
+.data-table thead {
+    position: sticky;
+    top: 0px; /* заголовок прилипает к верху страницы */
+    z-index: 50; /* чтобы был выше строк таблицы */
+    background: #2a1745; /* фон обязателен, иначе строки будут просвечивать */
+}
+
 .data-table td {
     padding: 14px 20px;
     color: white;
@@ -617,12 +755,6 @@ body.menu-open .main-content {
     background: rgba(124, 77, 255, 0.1);
 }
 
-.data-table thead {
-    position: sticky;
-    top: 0px; /* заголовок прилипает к верху страницы */
-    z-index: 50; /* чтобы был выше строк таблицы */
-    background: #2a1745; /* фон обязателен, иначе строки будут просвечивать */
-}
 
 
 
@@ -743,11 +875,16 @@ body.menu-open .main-content {
 
 
 .game-meta span {
-    font-size: 0.95rem;
-    color: #c5b6e6;
+    font-size: 1.05rem;
+    color: #d1c4e9;
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+.game-meta i {
+    color: #7c4dff;
+    width: 16px;
 }
 
 .team-header {
@@ -957,19 +1094,36 @@ body.menu-open .main-content {
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* Цвета для медалей в достижениях */
+/* Цвета для наград в достижениях */
+.achievements-section .cup {
+    color: #FFD700;
+    background: rgba(255, 215, 0, 0.15);
+}
+
 .achievements-section .gold {
     color: #FFD700;
     background: rgba(255, 215, 0, 0.1);
 }
+
 .achievements-section .silver {
     color: #C0C0C0;
     background: rgba(192, 192, 192, 0.1);
 }
+
 .achievements-section .bronze {
     color: #CD7F32;
     background: rgba(205, 127, 50, 0.1);
 }
+
+.tournament-stats span {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 
 
 
@@ -982,7 +1136,7 @@ body.menu-open .main-content {
 }
 
 .history-table th {
-    background: rgba(124, 77, 255, 0.15);
+    background: #2a1745;
     color: #e0d7f5;
     font-weight: 600;
     padding: 14px 16px;
@@ -1011,8 +1165,9 @@ body.menu-open .main-content {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
 }
+
 
 .excel-style-table-container {
     margin: 0 auto 20px auto;
@@ -1057,7 +1212,7 @@ body.menu-open .main-content {
 }
 
 .game-info {
-    background: #2a1745;
+    background: rgba(42, 23, 69, 0.6);
     padding: 20px;
     border-radius: 8px;
     border: 1px solid #3d2a5e;
@@ -1073,7 +1228,7 @@ body.menu-open .main-content {
 }
 
 .game-info p {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
 }
 
 /* Адаптивность для мобильных */
@@ -1148,91 +1303,6 @@ body.menu-open .main-content {
 }
 
 
-/* Стили для состояния загрузки и ошибок */
-.loading {
-    text-align: center;
-    padding: 50px;
-    color: #b39ddb;
-    font-size: 1.2rem;
-}
-
-.error {
-    text-align: center;
-    padding: 50px;
-    color: #ff6b6b;
-    font-size: 1.2rem;
-}
-
-
-
-/* ============================================= */
-/* ИСПРАВЛЕНИЕ ОТСТУПОВ ПРИ AJAX ФИЛЬТРАЦИИ */
-/* ============================================= */
-
-/* Убираем лишние отступы у контейнера таблиц */
-.table-content {
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* Исправляем отступы для загрузки и ошибок */
-.table-content > .loading,
-.table-content > .error {
-    padding: 50px;
-    text-align: center;
-    margin: 0;
-}
-
-/* Убедимся, что таблицы не имеют лишних отступов */
-.table-wrapper {
-    margin: 0;
-    padding: 20px;
-}
-
-/* Фиксируем отступ между панелью управления и таблицами */
-.control-panel + .table-content {
-    margin-top: 25px;
-}
-
-/* Убираем возможные двойные отступы после AJAX */
-#ajax-content > .table-wrapper {
-    margin: 0;
-    padding: 0;
-}
-
-/* Исправляем отступы для вложенных таблиц */
-#ajax-content .table-wrapper {
-    padding: 20px;
-}
-
-/* Гарантируем, что не будет лишних отступов */
-#ajax-content > * {
-    margin: 0;
-    padding: 0;
-}
-
-#ajax-content > .table-wrapper > * {
-    margin: 0;
-    padding: 0;
-}
-
-/* Исправляем для мобильных */
-@media (max-width: 768px) {
-    .table-wrapper {
-        padding: 15px;
-    }
-    
-    #ajax-content .table-wrapper {
-        padding: 15px;
-    }
-    
-    .table-content > .loading,
-    .table-content > .error {
-        padding: 30px;
-    }
-}
-
-
 /* Стили для пагинации */
 .pagination {
     display: flex;
@@ -1251,7 +1321,7 @@ body.menu-open .main-content {
     height: 32px;
     background: #2a1745;
     color: #b39ddb;
-    border: 1px solid #4a376b;
+    border: 1px solid rgba(124, 77, 255, 0.2);
     border-radius: 5px;
     text-decoration: none;
     transition: all 0.2s;
@@ -1259,9 +1329,8 @@ body.menu-open .main-content {
 }
 
 .pagination-arrow:hover {
-    background: #7c4dff;
+    background: #3d2a5e;
     color: white;
-    border-color: #9575cd;
 }
 
 .pagination-btn {
@@ -1272,7 +1341,7 @@ body.menu-open .main-content {
     height: 32px;
     background: #2a1745;
     color: #b39ddb;
-    border: 1px solid #4a376b;
+    border: 1px solid rgba(124, 77, 255, 0.2);
     border-radius: 5px;
     text-decoration: none;
     font-weight: 500;
@@ -1338,3 +1407,225 @@ body.menu-open .main-content {
     border: 1px solid rgba(124, 77, 255, 0.15);
     font-size: 0.85rem;
 }
+
+/* Стили для состояния загрузки и ошибок */
+.loading {
+    text-align: center;
+    padding: 8rem 2rem;
+    color: #d1c4e9;
+    font-size: 2.2rem;
+    font-family: 'Actay Wide', Arial, sans-serif;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    background: rgba(31, 15, 58, 0.8);
+    border-radius: 16px;
+    border: 2px solid rgba(124, 77, 255, 0.2);
+    margin: 20px;
+}
+
+.loading::before {
+    content: "";
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(124, 77, 255, 0.3);
+    border-top: 3px solid #7c4dff;
+    border-radius: 50%;
+    margin-bottom: 25px;
+    animation: spin 1s linear infinite;
+}
+
+.error {
+    text-align: center;
+    padding: 6rem 2rem;
+    color: #ff8a8a;
+    font-size: 1rem;
+    font-family: 'Actay Wide', Arial, sans-serif;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    background: rgba(31, 15, 58, 0.8);
+    border-radius: 16px;
+    border: 2px solid rgba(255, 107, 107, 0.3);
+    margin: 20px;
+}
+
+.error::before {
+    content: "✕";
+    font-size: 3rem;
+    color: #ff6b6b;
+    margin-bottom: 20px;
+    display: block;
+    font-weight: bold;
+}
+
+/* Анимация круга */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Простая анимация пульсации текста */
+@keyframes pulseText {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.loading {
+    animation: pulseText 2s ease-in-out infinite;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .loading {
+        padding: 5rem 1.5rem;
+        font-size: 1.8rem;
+        min-height: 250px;
+    }
+    
+    .loading::before {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 20px;
+    }
+    
+    .error {
+        padding: 4rem 1.5rem;
+        font-size: 1.5rem;
+        min-height: 200px;
+    }
+    
+    .error::before {
+        font-size: 2.5rem;
+    }
+}
+
+
+
+/* ============================================= */
+/* ИСПРАВЛЕНИЕ ОТСТУПОВ ПРИ AJAX ФИЛЬТРАЦИИ */
+/* ============================================= */
+
+/* Убираем лишние отступы у контейнера таблиц */
+.table-content {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Убедимся, что таблицы не имеют лишних отступов */
+.table-wrapper {
+    margin: 0;
+    padding: 20px;
+}
+
+/* Фиксируем отступ между панелью управления и таблицами */
+.control-panel + .table-content {
+    margin-top: 25px;
+}
+
+/* Убираем возможные двойные отступы после AJAX */
+#ajax-content > .table-wrapper {
+    margin: 0;
+    padding: 0;
+}
+
+/* Исправляем отступы для вложенных таблиц */
+#ajax-content .table-wrapper {
+    padding: 20px;
+}
+
+/* Гарантируем, что не будет лишних отступов */
+#ajax-content > * {
+    margin: 0;
+    padding: 0;
+}
+
+#ajax-content > .table-wrapper > * {
+    margin: 0;
+    padding: 0;
+}
+
+/* Исправляем для мобильных */
+@media (max-width: 768px) {
+    .table-wrapper {
+        padding: 15px;
+    }
+    
+    #ajax-content .table-wrapper {
+        padding: 15px;
+    }
+    
+    .table-content > .loading,
+    .table-content > .error {
+        padding: 30px;
+    }
+}
+
+
+
+/* Стили для скроллбара */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(31, 15, 58, 0.8);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4a376b;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #7c4dff;
+}
+
+/* Для Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #4a376b rgba(31, 15, 58, 0.8);
+}
+
+/* Стили для скроллбара внутри модальных окон */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(31, 15, 58, 0.6);
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #5a3f8b;
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #7c4dff;
+}
+
+/* Для Firefox модальных окон */
+.modal-content {
+    scrollbar-width: thin;
+    scrollbar-color: #5a3f8b rgba(31, 15, 58, 0.6);
+}
+
+

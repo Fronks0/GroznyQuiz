@@ -39,7 +39,6 @@
             <div class="filter-box">
                 <label><i class="fas fa-location-dot"></i> Город:</label>
                 <select name="city">
-                    <option value="">Все города</option>
                     {% for city_obj in all_cities %}
                         <option value="{{ city_obj.name }}" 
                                 {% if selected_city == city_obj.name %}selected{% endif %}>

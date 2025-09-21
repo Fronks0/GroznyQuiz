@@ -6,9 +6,11 @@ class CityAdmin(admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
 
+
 @admin.register(TournamentSeries)
 class TournamentSeriesAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['name', 'tournament_type', 'display_order']
+    list_filter = ['tournament_type']
     search_fields = ['name']
 
 @admin.register(Topic)
