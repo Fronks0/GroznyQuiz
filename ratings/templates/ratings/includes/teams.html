@@ -5,10 +5,10 @@
             <tr>
                 <th>Место</th>
                 <th>Команда</th>
-                <th>Город</th>
+                <th>Пояс</th>
+                <th>Очки</th>
                 <th>Игр сыграно</th>
                 <th>Побед</th>
-                <th>Очки</th>
                 <th>Ср. балл</th>
             </tr>
         </thead>
@@ -17,10 +17,28 @@
                 <tr class="team-row" data-team-id="{{ team.id }}">
                     <td>{{ forloop.counter0|add:teams.start_index }}</td>
                     <td>{{ team.name }}</td>
-                    <td>{{ team.city.name }}</td>
+                    <td class="power-cell">
+                        <div class="clean-belt mini  <!-- ДОБАВЛЯЕМ КЛАСС mini -->
+                                {% if team.get_belt_info.belt_name == 'Белый' %}white
+                                {% elif team.get_belt_info.belt_name == 'Синий' %}blue
+                                {% elif team.get_belt_info.belt_name == 'Пурпурный' %}purple
+                                {% elif team.get_belt_info.belt_name == 'Коричневый' %}brown
+                                {% elif team.get_belt_info.belt_name == 'Чёрный' %}black
+                                {% elif team.get_belt_info.belt_name == 'Красный' %}red
+                                {% endif %} 
+                                s-{{ team.get_belt_info.stripes_count }}"
+                            title="{{ team.get_belt_info.level_name }} ({{ team.total_points_sum|floatformat:0 }} очков)">
+                            <div class="clean-vertical-lines">
+                                <span class="clean-line"></span>
+                                <span class="clean-line"></span>
+                                <span class="clean-line"></span>
+                                <span class="clean-line"></span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ team.total_points_sum|default:0|floatformat }}</td>
                     <td>{{ team.games_played_count|default:0 }}</td>
                     <td>{{ team.wins_count|default:0 }}</td>
-                    <td>{{ team.total_points_sum|default:0|floatformat }}</td>
                     <td>{{ team.avg_points|floatformat:"-1"|default:0 }}</td>
                 </tr>
             {% empty %}

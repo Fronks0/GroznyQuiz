@@ -2,7 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.db.models import Count, Q, Sum, F, Max, FloatField, Window, When, Case
 from decimal import Decimal
-from django.db.models.functions import Coalesce, DenseRank
+from django.db.models.functions import Coalesce
 
 
 #Расчеты для таблицы команд(teams.hmtl)
@@ -116,12 +116,15 @@ class TournamentTopic(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название команды", unique=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, verbose_name="Город команды")
+
     objects = TeamQuerySet.as_manager()
     
-
     class Meta:
         verbose_name = "Команда"
         verbose_name_plural = "Команды"
+
+    def get_belt_info(self):
+        return get_belt_info(self.total_points_sum or 0)
 
     # Подсчеты для секции "Достижения"
     def get_series_stats(self):
@@ -270,9 +273,119 @@ class TopicResult(models.Model):
 
 
 
+BELT_SYSTEM = [
+    {
+        'name': 'Белый',
+        'color': '#F0F0F0',
+        'min_score': 0,
+        'max_score': 50,
+        'levels': [
+            {'min': 0, 'max': 10, 'name': 'Белый 0'},
+            {'min': 10, 'max': 20, 'name': 'Белый 1'},
+            {'min': 20, 'max': 30, 'name': 'Белый 2'},
+            {'min': 30, 'max': 40, 'name': 'Белый 3'},
+            {'min': 40, 'max': 50, 'name': 'Белый 4'}
+        ]
+    },
+    {
+        'name': 'Синий',
+        'color': '#1E90FF',
+        'min_score': 50,
+        'max_score': 100,
+        'levels': [
+            {'min': 50, 'max': 60, 'name': 'Синий 0'},
+            {'min': 60, 'max': 70, 'name': 'Синий 1'},
+            {'min': 70, 'max': 80, 'name': 'Синий 2'},
+            {'min': 80, 'max': 90, 'name': 'Синий 3'},
+            {'min': 90, 'max': 100, 'name': 'Синий 4'}
+        ]
+    },
+    {
+        'name': 'Пурпурный',
+        'color': '#800080',
+        'min_score': 100,
+        'max_score': 1500,
+        'levels': [
+            {'min': 100, 'max': 110, 'name': 'Пурпурный 0'},
+            {'min': 110, 'max': 120, 'name': 'Пурпурный 1'},
+            {'min': 120, 'max': 130, 'name': 'Пурпурный 2'},
+            {'min': 130, 'max': 140, 'name': 'Пурпурный 3'},
+            {'min': 140, 'max': 150, 'name': 'Пурпурный 4'}
+        ]
+    },
+    {
+        'name': 'Коричневый',
+        'color': '#8B4513',
+        'min_score': 150,
+        'max_score': 200,
+        'levels': [
+            {'min': 150, 'max': 160, 'name': 'Коричневый 0'},
+            {'min': 160, 'max': 170, 'name': 'Коричневый 1'},
+            {'min': 170, 'max': 180, 'name': 'Коричневый 2'},
+            {'min': 180, 'max': 190, 'name': 'Коричневый 3'},
+            {'min': 190, 'max': 200, 'name': 'Коричневый 4'}
+        ]
+    },
+    {
+        'name': 'Чёрный',
+        'color': '#000000',
+        'min_score': 200,
+        'max_score': 300,
+        'levels': [
+            {'min': 200, 'max': 220, 'name': 'Чёрный 0'},
+            {'min': 220, 'max': 240, 'name': 'Чёрный 1'},
+            {'min': 240, 'max': 260, 'name': 'Чёрный 2'},
+            {'min': 260, 'max': 280, 'name': 'Чёрный 3'},
+            {'min': 280, 'max': 300, 'name': 'Чёрный 4'}
+        ]
+    },
+    {
+        'name': 'Красный',
+        'color': '#FF0000',
+        'min_score': 3000,
+        'max_score': float('inf'),
+        'levels': [
+            {'min': 3000, 'max': 3500, 'name': 'Красный 0'},
+            {'min': 3500, 'max': 4000, 'name': 'Красный 1'},
+            {'min': 4000, 'max': 4500, 'name': 'Красный 2'},
+            {'min': 4500, 'max': 5000, 'name': 'Красный 3'},
+            {'min': 5000, 'max': float('inf'), 'name': 'Красный 4'}
+        ]
+    }
+]
 
 
 
 
-
-
+# Функция определения пояса
+def get_belt_info(score):
+    score = score or 0 #Защита от None
+    for belt in BELT_SYSTEM:
+        if belt['min_score'] <= score < belt['max_score']: # Находим тот пояс, в диапазон которого попадает количество очков.
+            for level in belt['levels']:
+                if level['min'] <= score < level['max']: # Определяем количество линий (полосок) на поясе
+                    stripes_count = belt['levels'].index(level)
+                    
+                    return {
+                        'belt_name': belt['name'],
+                        'belt_color': belt['color'],
+                        'level_name': level['name'],
+                        'current_score': score,
+                        'progress': ((score - level['min']) / (level['max'] - level['min'])) * 100,
+                        'next_level': level['max'],
+                        'belt_progress': ((score - belt['min_score']) / (belt['max_score'] - belt['min_score'])) * 100,
+                        'stripes_count': stripes_count,  # Добавляем количество полосок
+                        'level_number': stripes_count + 1  # Номер уровня (1-5)
+                    }
+    # Для максимального уровня
+    return {
+        'belt_name': BELT_SYSTEM[-1]['name'],
+        'belt_color': BELT_SYSTEM[-1]['color'],
+        'level_name': BELT_SYSTEM[-1]['levels'][-1]['name'],
+        'current_score': score,
+        'progress': 100,
+        'next_level': 'Максимум',
+        'belt_progress': 100,
+        'stripes_count': 4,  # 4 полоски для максимального уровня
+        'level_number': 5
+    }

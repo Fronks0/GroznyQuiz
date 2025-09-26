@@ -564,12 +564,14 @@ function initRadarChart() {
     // === ОКРУГЛЕНИЕ ДЛЯ ОТОБРАЖЕНИЯ (до 0.5) ===
     const displayValues = rawValues.map(value => {
         // Округляем до ближайшего 0.5
-        return Math.round(value * 2) / 2;
+        const rounded = Math.round(value * 2) / 2;
+        // Ограничиваем максимальное значение 5 для отображения
+        return Math.min(rounded, 5);
     });   
 
     // === НАСТРОЙКИ МАСШТАБА ДИАГРАММЫ ===
     const minValue = 0;   // Минимальное значение на шкале (центр диаграммы)
-    const maxValue = 6;   // Максимальное значение на шкале (внешний круг)
+    const maxValue = 5;   // Максимальное значение на шкале (внешний круг)
 
     // === СОЗДАНИЕ И НАСТРОЙКА ДИАГРАММЫ ===
     new Chart(radarCanvas, {

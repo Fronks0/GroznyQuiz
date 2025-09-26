@@ -718,15 +718,15 @@ body.menu-open .main-content {
 
 .data-table {
     width: 100%;
-    border-collapse: separate; /* исправляет баг со sticky */
-    border-spacing: 0; /* чтобы не появлялись лишние пробелы */
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .data-table th {
     padding: 16px 20px;
     background: #2a1745;
     color: #d1c4e9;
-    text-align: left;
+    text-align: center;
     font-weight: 600;
     border-bottom: 2px solid #3d2a5e;
     font-size: 1rem;
@@ -734,9 +734,9 @@ body.menu-open .main-content {
 
 .data-table thead {
     position: sticky;
-    top: 0px; /* заголовок прилипает к верху страницы */
-    z-index: 50; /* чтобы был выше строк таблицы */
-    background: #2a1745; /* фон обязателен, иначе строки будут просвечивать */
+    top: 0px;
+    z-index: 50;
+    background: #2a1745;
 }
 
 .data-table td {
@@ -745,6 +745,7 @@ body.menu-open .main-content {
     border-bottom: 1px solid #3d2a5e;
     font-size: 1rem;
     cursor: pointer;
+    text-align: center;
 }
 
 .data-table tr:last-child td {
@@ -756,6 +757,14 @@ body.menu-open .main-content {
 }
 
 
+ /* Убираю центрирование у команды в таблице*/ 
+#teams-table .data-table th:nth-child(2), #teams-table .data-table td:nth-child(2) {
+    text-align: left;
+}
+
+#games-table .data-table th:nth-child(5), #games-table .data-table td:nth-child(5){
+    text-align: left;
+}
 
 
 
@@ -778,12 +787,12 @@ body.menu-open .main-content {
 
     /* Размер шрифта таблиц */
     .data-table th{
-        font-size: 0.9rem;
+        font-size: 1rem;
         
     }
 
     .data-table td{
-        font-size: 0.8rem;
+        font-size: 0.9rem;
     }
 }
 
@@ -973,23 +982,14 @@ body.menu-open .main-content {
     letter-spacing: 1px;
     z-index: 2;
 }
-
 /* ====== СТИЛИ ДЛЯ МОДАЛКИ КОМАНДЫ ====== */
 
-/* Контейнер статистики с диаграммой */
-.stats-container {
+/* Статистика */
+.team-stats-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-
-}
-
-/* Сетка карточек 2x3 */
-.stats-cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
+    margin-bottom: 10px;
 }
 
 .stat-card {
@@ -1002,22 +1002,16 @@ body.menu-open .main-content {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 120px;
-    position: relative;
-    overflow: hidden;
+    min-height: 100px;
 }
 
 .stat-value {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #fff;
     margin-bottom: 5px;
     line-height: 1;
     text-shadow: 0 0 10px rgba(124, 77, 255, 0.3);
-}
-
-.best-topic .stat-value {
-    font-size: 1.4rem;
 }
 
 .stat-label {
@@ -1034,7 +1028,221 @@ body.menu-open .main-content {
     border: 1px solid rgba(124, 77, 255, 0.2);
 }
 
-/* Диаграмма */
+/* ===== Контейнер для пояса и радара ===== */
+.belt-radar-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+/* Пояс */
+.belt-section {
+    background: rgba(42, 23, 69, 0.6);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid rgba(124, 77, 255, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.belt-title {
+    color: #e6ddff;
+    text-align: center;
+    margin-bottom: 5px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* Основной контейнер пояса с информацией */
+.belt-main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+
+/* Визуальная часть пояса */
+.belt-visual {
+    display: flex;
+    min-width: 220px;
+    margin-bottom: 15px;
+}
+
+.clean-belt {
+    --belt-light: #f4f4f4;
+    --belt-dark: #d9d9d9;
+    --stripe-color: #000;
+
+    height: 40px;
+    width: 250px;
+    max-width: 250px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    transform: skew(-20deg);
+    background: linear-gradient(135deg, var(--belt-light) 0%, var(--belt-dark) 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+/* Полосы на поясе */
+.clean-vertical-lines {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 3;
+}
+
+.clean-line {
+    width: 18px;
+    height: 100%;
+    background: var(--stripe-color);
+    transform: skew(-10deg);
+    border-radius: 2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Управление видимостью полосок */
+.clean-belt.s-0 .clean-line { display: none; }
+.clean-belt.s-1 .clean-line:nth-child(n+2) { display: none; }
+.clean-belt.s-2 .clean-line:nth-child(n+3) { display: none; }
+.clean-belt.s-3 .clean-line:nth-child(n+4) { display: none; }
+.clean-belt.s-4 .clean-line:nth-child(n+5) { display: none; }
+
+/* Цвета поясов*/
+.clean-belt.white { --belt-light: #FFFFFF; --belt-dark: #F0F0F0; --stripe-color: #2D3748; }
+.clean-belt.blue { --belt-light: #1E90FF; --belt-dark: #0066CC; --stripe-color: #FFFFFF; }
+.clean-belt.purple { --belt-light: #800080; --belt-dark: #600060; --stripe-color: #FFFFFF; }
+.clean-belt.brown { --belt-light: #8B4513; --belt-dark: #6B3410; --stripe-color: #FFFFFF; }
+.clean-belt.black { --belt-light: #000000; --belt-dark: #000000; --stripe-color: #FFFFFF; }
+.clean-belt.red { --belt-light: #FF0000; --belt-dark: #CC0000; --stripe-color: #FFFFFF; }
+
+/* Информация о поясе*/
+.belt-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 100%;
+}
+
+.belt-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(124, 77, 255, 0.1);
+}
+
+.belt-info-item:last-child {
+    border-bottom: none;
+}
+
+.belt-info-label {
+    color: #b39ddb;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.belt-info-value {
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Прогресс-бар уровня */
+.belt-progress-section {
+    margin-top: 15px;
+    background: rgba(124, 77, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.belt-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.belt-progress-label {
+    color: #d1c4e9;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.belt-progress-percent {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.belt-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.belt-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    position: relative;
+    width: 0%;
+    display: block;
+}
+
+/* Мини-пояс для таблицы */
+.clean-belt.mini {
+    height: 22px;
+    width: 90px;
+    max-width: 100px;
+    border-radius: 4px;
+    margin: 0 auto;
+}
+
+.clean-belt.mini .clean-line {
+    width: 6px;
+    height: 100%;
+    background: var(--stripe-color);
+    transform: skew(-10deg);
+    border-radius: 0;
+    margin-right: 2px;
+}
+
+.clean-belt.mini .clean-vertical-lines {
+    right: 6px;
+    gap: 3px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .belt-main-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .belt-visual {
+        min-width: auto;
+    }
+
+    .clean-belt {
+        height: 35px;
+        max-width: 200px;
+    }
+}
+
+/* ===== СТИЛИ ДЛЯ РАДАРА ===== */
+
 .stats-radar {
     background: rgba(42, 23, 69, 0.6);
     border: 1px solid rgba(124, 77, 255, 0.25);
@@ -1042,6 +1250,7 @@ body.menu-open .main-content {
     padding: 20px;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .stats-radar h3 {
@@ -1058,6 +1267,40 @@ body.menu-open .main-content {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .team-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .belt-radar-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .belt-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .clean-belt {
+        height: 30px;
+        max-width: 180px;
+    }
+    
+    .clean-belt.mini {
+        height: 20px;
+        width: 70px;
+    }
+    
+    .stat-card {
+        min-height: 100px;
+        padding: 15px 10px;
+    }
+    
+    .stats-radar {
+        min-height: 250px;
+    }
 }
 
 /* Секция достижений */
@@ -1627,5 +1870,4 @@ body.menu-open .main-content {
     scrollbar-width: thin;
     scrollbar-color: #5a3f8b rgba(31, 15, 58, 0.6);
 }
-
 

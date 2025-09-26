@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render
-from .models import City, GameResult,Team, Topic, Tournament, TournamentSeries
+from .models import City, GameResult,Team, Topic, Tournament, TournamentSeries, BELT_SYSTEM
 from django.db.models import Count, Prefetch
 from django.core.paginator import Paginator
 
@@ -10,9 +10,12 @@ from .utils import filter_team_and_tournament
 
 
 
-# Даны или пояса как сила для рейтинга вместо города
-
+# Даны и пояса добавить
 # Центрировать значения в таблицах
+# Огрнаичить радар 5 средним баллом.
+
+
+
 # телефонное отоброжение настроить
 # Убрать Header и сделать "Вернуться на сайт"
 # Кеширование
@@ -54,7 +57,7 @@ def index(request):
 
     # === Пагинация ===
     page = request.GET.get('page', 1)
-    items_per_page = 5
+    items_per_page = 100
 
     if active_tab == 'teams':
         paginator = Paginator(teams, items_per_page)
@@ -79,6 +82,7 @@ def index(request):
         'selected_game_series': request.GET.get('game_series'),
         'active_tab': active_tab,
         'search_query': search_query,
+        'belt_system': BELT_SYSTEM
     }
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
